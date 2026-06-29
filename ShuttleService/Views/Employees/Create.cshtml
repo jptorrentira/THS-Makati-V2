@@ -1,0 +1,867 @@
+﻿@model ShuttleService.Models.Employee
+
+@{
+    ViewData["Title"] = "Employee Maintenance";
+}
+<style>
+    .select2-container {
+        z-index: 99999 !important;
+        width: 100% !important;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div class="wrapper-content row">
+            <div class="col-md-10 pull-left">
+                <h4>Employee Maintenance - @ViewBag.neworupdate</h4>
+            </div>
+        </div>
+
+        <div class="wrapper wrapper-content animated fadeInRight white-bg">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 style="color:#1ab394">Employee Information</h3>
+                    <hr />
+                </div>
+
+            </div>
+            <div class="row">
+                <form asp-action="Create" id="PageForm" class="form-horizontal">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="EmployeeNo" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="EmployeeNo" class="form-control" />
+                                <span asp-validation-for="EmployeeNo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="FirstName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MiddleName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="MiddleName" class="form-control" />
+                                <span asp-validation-for="MiddleName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LastName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Position" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="Position" class="form-control" />
+                                <span asp-validation-for="Position" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyGroupId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="CompanyGroupId" class="form-control select2simple" onchange="checkCompanyList();checkChargingCompanyList();" asp-items="ViewBag.CompanyGroupId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyListId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="CompanyListId" class="form-control select2simple" onchange="checkDepartment();" asp-items="ViewBag.CompanyListId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="DepartmentListId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="DepartmentListId" class="form-control" asp-items="ViewBag.DepartmentListId">
+                                    <option default>Please select company first</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ChargingCompanyId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="ChargingCompanyId" class="form-control select2simple" onchange="checkChargingDepartment();" asp-items="ViewBag.ChargingCompanyId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ChargingDepartmentId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="ChargingDepartmentId" class="form-control" asp-items="ViewBag.ChargingDepartmentId">
+                                    <option default>Please select charging company first</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" id="locationField" style="display: none;">
+                            <label asp-for="LocationIds" class="control-label col-md-3">Location/s</label>
+                            <div class="col-md-8">
+                                <select asp-for="LocationIds" class="form-control select2simple" multiple asp-items="ViewBag.LocationListId">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Gender" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="Gender" class="form-control select2simple">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="NationalityId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="NationalityId" class="form-control select2simple" asp-items="ViewBag.NationalityId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MobileNumber" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="MobileNumber" data-mask="09999999999" placeholder="ex. 09999999999" class="form-control" />
+                                <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LocalNumber" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="LocalNumber" data-mask="9999" placeholder="ex. 9999" class="form-control" />
+                                <span asp-validation-for="LocalNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyEmail" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="CompanyEmail" type="email" class="form-control" />
+                                <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="AlternativeEmail" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="AlternativeEmail" type="email" class="form-control" />
+                                <span asp-validation-for="AlternativeEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="SupervisorEmployeeNo" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+
+                                <select asp-for="SupervisorEmployeeNo" class="form-control" ></select>
+                                @*<input asp-for="SupervisorEmployeeNo" class="form-control" />*@
+                                <span asp-validation-for="SupervisorEmployeeNo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+
+                                <div class="checkbox checkbox-info">
+                                    <input asp-for="IsImmediateHead" id="IsImmediateHead" name="IsImmediateHead" value="false" type="checkbox" class="ebeBoolean" />
+
+                                    <label for="IsImmediateHead"> Please check here to identify that he/she is an immediate head</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    @if (ViewBag.neworupdate == "Edit")
+                                    {
+                                        <button type="button" id="btnCreate" class="ladda-button btn btn-primary" data-style="expand-left">
+                                            <span>Update</span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" id="btnCreate" class="ladda-button btn btn-warning" data-style="expand-left">
+                                            <span>Create</span>
+                                        </button>
+                                    }
+                                    <a id="backtolist" class="btn btn-danger">Back to List</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label asp-for="Status" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="Status" class="form-control" />
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+
+
+                            <div class="row hidden">
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHead" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHead" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHead" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHeadValidFrom" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHeadValidFrom" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHeadValidFrom" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHeadValidTo" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHeadValidTo" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHeadValidTo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input asp-for="AlternateImmediateHeadValidity" /> @Html.DisplayNameFor(model => model.AlternateImmediateHeadValidity)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="EncodedBy" class="control-label"></label>
+                                    <input asp-for="EncodedBy" class="form-control" />
+                                    <span asp-validation-for="EncodedBy" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="LastModifiedBy" class="control-label"></label>
+                                    <input asp-for="LastModifiedBy" class="form-control" />
+                                    <span asp-validation-for="LastModifiedBy" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="EncodeDate" class="control-label"></label>
+                                    <input asp-for="EncodeDate" class="form-control" />
+                                    <span asp-validation-for="EncodeDate" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="ModifyDate" class="control-label"></label>
+                                    <input asp-for="ModifyDate" class="form-control" />
+                                    <span asp-validation-for="ModifyDate" class="text-danger"></span>
+                                </div>
+                                @*<div class="form-group">
+                                        <input type="submit" value="Create" class="btn btn-default" />
+                                    </div>*@
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                @*for locking of employee*@
+                <div class="col-md-6 ">
+
+                    <div class="row">
+                        <div class=" col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Locked details:</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class=" col-sm-12">
+                            <table id="data_table_lockedEmployees" class="table table-striped table-bordered table-hover text-center table100"></table>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+
+                        <form id="LockForm">
+                            <div class=" col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label"> Locked from: </label>
+                                    <input id="LockedFrom" name="LockedFrom" style="background-color: white;" class="form-control datepicker" readonly />
+                                </div>
+                            </div>
+
+                            <div class=" col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label"> Locked until: </label>
+                                    <input id="LockedTo" name="LockedTo" style="background-color: white;" class="form-control datepicker" readonly />
+                                </div>
+                            </div>
+
+                            <div class=" col-sm-12">
+                                <div class="form-group">
+                                    <label class="control-label"> Reason: </label>
+                                    <input id="LockedRemarks" name="LockedRemarks" class="form-control" />
+                                </div>
+                            </div>
+                        </form>
+                        <div class=" col-sm-12">
+                            <div class="form-group">
+                                <button type="button" id="btnLock" class="ladda-button btn btn-primary pull-right" data-style="expand-left">
+                                    <span>Add Lock Details</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+            <hr />
+
+        </div>
+
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script>
+    $(document).ready(function() {
+        // Initial check
+        checkCompanyGroup();
+
+        // Trigger check when CompanyGroupId changes
+        $("#CompanyGroupId").on("change", function() {
+            checkCompanyGroup();
+        });
+
+    });
+
+    $('.datepicker').datepicker({
+        keyboardNavigation: false,
+        forceParse: false,
+        autoclose: true,
+        todayHighlight: false
+    });
+
+            var reloader = 0;
+    var table1 = $('#data_table_lockedEmployees').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+        "searching": true,
+        "scrollX": true,
+        "bLengthChange": false,
+        "ajax": {
+            "url": "@Url.Content("~/employees/lockedEmployeeLists")",
+            "type": "POST",
+             "data": function (d) {
+                var empID = @ViewBag.empID;
+                 d.empID = empID;
+            }
+        },
+        "columns": [
+            { "data": "id", title: "Action",width: "5%",align:"center", orderable: false},
+            { "data": "dateFrom", title: "Locked From", orderable: false },
+            { "data": "dateTo", title: "Locked To", orderable: false },
+            { "data": "remarks", title: "Remarks", orderable: false },
+            { "data": "encodedBy", title: "Encoded By", orderable: false },
+
+        ]
+
+        ,
+        'select': {
+            'style': 'single'
+        },
+        'columnDefs': [
+            {
+                "targets": "_all", // your case first column
+                "className": "text-center",
+            }],
+        "order": [[0, "desc"]],
+        "initComplete": function (settings, json) {
+            if (reloader == 0) {
+                reloader = 1;
+                var myVar = setInterval(function () {
+                    $('#data_table_lockedEmployees').DataTable().columns.adjust().draw();
+                    clearInterval(myVar);
+                }, 500);
+
+            }
+        }
+    });
+
+
+    var atlLocked = $('#btnLock').ladda();
+    atlLocked.click(function () {
+
+        if ($("#btnLock").is('[disabled]') == false) {
+
+            if ($("#LockedFrom").val() == "" || $("#LockedTo").val() == "" || $("#LockedRemarks").val() == "") {
+
+                swal({
+                    title: "Error",
+                    text: "Please complete all details.",
+                    type: "error"
+                });
+
+            } else {
+                swal({
+                    title: "Are you sure?",
+                    text: "This will save the employee locked details",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Save it!",
+                    closeOnConfirm: false,
+                }, function (isConfirm) {
+                    if (isConfirm) {
+
+                            $("#ModalLoading").modal("show");
+                            $("#ModalLoading").css('display', 'block');
+
+                            // Start loading
+                            atlLocked.ladda('start');
+                            $("#backtolist").attr('disabled', 'disabled');
+
+                            var urlPost = "";
+                                urlPost = "@Url.Content("~/employees/LockEmployee")/" + $("#Id").val();
+
+                            $.ajax({
+                                type: "POST",
+                                url: urlPost,
+                                data: $("#LockForm").serialize(),
+                                //"contentType": "application/json; charset=utf-8",
+                                dataType: "JSON",
+                                success: function (data, textStatus, jqXHR) {
+                                    $("#ModalLoading").modal("hide");
+                                    if (data.success == 1) {
+
+                                            swal({
+                                                title: "Success",
+                                                text: "Success! This page will reload after clicking (OK)",
+                                                type: "success"
+                                            },
+                                                function () {
+                                                    location.reload();
+                                                   // window.location.href = "@Url.Content("~/employees/index")";
+                                            });
+
+                                    } else {
+                                                 swal({
+                                                    title: "Error",
+                                                     text: data.message,
+                                                    type: "error"
+                                                });
+
+
+                                    }
+
+                                    $("#backtolist").removeAttr('disabled');
+                                    atl.ladda('stop');
+                                    $("#ModalLoading").css('display', 'none');
+                                }
+                            });
+
+
+
+                    }
+
+                });
+
+
+
+            }
+
+        }
+    });
+
+</script>
+
+
+<script>
+
+    $('#backtolist').click(function () {
+        if ($("#backtolist").is('[disabled]') == false) {
+            window.location.href = "@Url.Content("~/employees/index")";
+        }
+    });
+
+
+
+
+    var atl = $('#btnCreate').ladda();
+    atl.click(function () {
+
+        if ($("#btnCreate").is('[disabled]') == false) {
+
+
+            if ($("form").valid()) {
+                swal({
+                    title: "Are you sure?",
+                    text: "This will save the employee details",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Save it!",
+                    closeOnConfirm: false,
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        if ($("form").valid()) {
+
+                            $("#ModalLoading").modal("show");
+                            $("#ModalLoading").css('display', 'block');
+                            if ($("#IsImmediateHead").is(':checked')) {
+                                $("#IsImmediateHead").attr('value', 'true');
+                            } else {
+                                $("#IsImmediateHead").attr('value', 'false');
+                            }
+
+                            // Start loading
+                            atl.ladda('start');
+                            $("#backtolist").attr('disabled', 'disabled');
+
+                            var urlPost = "";
+                            if ("@ViewBag.neworupdate" == "Edit") {
+                                urlPost = "@Url.Content("~/employees/edit")/" + $("#Id").val();
+                            } else if ("@ViewBag.neworupdate" == "Create") {
+                                urlPost = "@Url.Content("~/employees/create")";
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: urlPost,
+                                data: $("#PageForm").serialize(),
+                                //"contentType": "application/json; charset=utf-8",
+                                dataType: "JSON",
+                                success: function (data, textStatus, jqXHR) {
+                                    $("#ModalLoading").modal("hide");
+                                    if (data.success == 1) {
+
+                                            swal({
+                                                title: "Success",
+                                                text: "Success! You will redirected to Employee List after clicking (OK)",
+                                                type: "success"
+                                            },
+                                                function () {
+                                                    window.location.href = "@Url.Content("~/employees/index")";
+                                            });
+
+                                    } else {
+                                                 swal({
+                                                    title: "Error",
+                                                     text: data.message,
+                                                    type: "error"
+                                                });
+
+
+                                    }
+
+                                    $("#backtolist").removeAttr('disabled');
+                                    atl.ladda('stop');
+                                    $("#ModalLoading").css('display', 'none');
+                                }
+                            });
+
+
+                        }
+                    }
+
+                });
+
+
+
+            }
+        }
+
+    });
+
+
+
+    $(document).ready(function () {
+         checkCompanyGroup();
+
+        // Trigger check when CompanyGroupId changes
+        $("#CompanyGroupId").on("change", function() {
+            checkCompanyGroup();
+        });
+
+
+        //$(".select2simple").select2({ placeholder: "Select an option", allowClear: true });
+        $(".select2simple").select2();
+        $("#SupervisorEmployeeNo").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getSupervisorData")",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        //default
+        var newOption = new Option("@ViewBag.supName", "@ViewBag.supID", true, true);
+            // Append it to the select
+        $('#SupervisorEmployeeNo').append(newOption).trigger('change');
+        //end default
+
+        if ("@ViewBag.neworupdate" == "Edit") {
+
+            $("#EmployeeNo").attr("readonly", true);
+        }
+        else if ("@ViewBag.neworupdate" == "Create") {
+            $("#NationalityId").val(139).trigger('change');
+            $("#EmployeeNo").removeAttr("readonly");
+
+            $("#CompanyGroupId").val("").trigger('change');
+            $("#CompanyListId").val("").trigger('change');
+            $("#DepartmentListId").val("").trigger('change');
+            $("#ChargingCompanyId").val("").trigger('change');
+            $("#ChargingDepartmentId").val("").trigger('change');
+        }
+
+         $('#EmployeeNo').on('change', fetchLocalUserInfo);
+
+    });
+
+    function checkCompanyList() {
+        $("#CompanyListId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getCompanyList?companyGroupId=")" + $("#CompanyGroupId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#CompanyListId").val("").trigger('change');
+        checkCompanyGroup();
+    }
+
+    function checkChargingCompanyList() {
+        $("#ChargingCompanyId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getChargingCompanyList?companyGroupId=")" + $("#CompanyGroupId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#ChargingCompanyId").val("").trigger('change');
+    }
+
+    function checkDepartment() {
+
+        $("#DepartmentListId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getDepartmentList?companyId=")" + $("#CompanyListId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#DepartmentListId").val("").trigger('change');
+    }
+
+    function checkChargingDepartment() {
+
+
+        $("#ChargingDepartmentId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getChargingDepartmentList?companyId=")" + $("#ChargingCompanyId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#ChargingDepartmentId").val("").trigger('change');
+    }
+
+    function checkCompanyGroup() {
+        var group = $("#CompanyGroupId option:selected").text();
+        if (group === "UPDI") {
+            $("#locationField").show();
+        } else {
+            $("#locationField").hide();
+            $("#LocationIds").val(null).trigger("change"); // clear selection
+        }
+    }
+
+    function checkselect2destroy() {
+        $("#CompanyGroupId").rules("add", {
+            required: true
+        });
+        $("#CompanyListId").rules("add", {
+            required: true
+        });
+        $("#DepartmentListId").rules("add", {
+            required: true
+        });
+        $("#ChargingCompanyId").rules("add", {
+            required: true
+        });
+        $("#ChargingDepartmentId").rules("add", {
+            required: true
+        });
+
+
+        if ($("#CompanyGroupId").val() != "") {
+            $("#CompanyGroupId").select2('destroy');
+        }
+
+        if ($("#CompanyListId").val() != "") {
+            $("#CompanyListId").select2('destroy');
+        }
+
+        if ($("#DepartmentListId").val() != "") {
+            $("#DepartmentListId").select2('destroy');
+        }
+
+        if ($("#ChargingCompanyId").val() != "") {
+            $("#ChargingCompanyId").select2('destroy');
+        }
+
+        if ($("#ChargingDepartmentId").val() != "") {
+            $("#ChargingDepartmentId").select2('destroy');
+        }
+    }
+
+    function fetchLocalUserInfo(){
+        var employeeNo = $('#EmployeeNo').val()
+        if(!employeeNo){
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("GetPeopleCoreEmployeeInfo", "Employees")',
+            type: 'POST',
+            data: {
+                employeeNo : employeeNo
+            },
+            success: function(data){
+                $('#FirstName').val(data.firstName).prop('readonly', true);
+                $('#MiddleName').val(data.middleName).prop('readonly', true);
+                $('#LastName').val(data.lastName).prop('readonly', true);
+                $('#Position').val(data.position);
+                $('#CompanyEmail').val(data.email);
+                $('#MobileNumber').val(data.mobileNo);
+            },
+            error: function(err){
+                swal({
+                        title: "Data fetch failed",
+                        text: "Employee No. not found in people core database",
+                        type: "warning"
+                    });
+                $('#FirstName').val('').prop('readonly', false);
+                $('#MiddleName').val('').prop('readonly', false);
+                $('#LastName').val('').prop('readonly', false);
+                $('#Position').val('');
+                $('#CompanyEmail').val('');
+                $('#MobileNumber').val('');
+            }
+        });
+    }
+
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        // executes when HTML-Document is loaded and DOM is ready
+
+        checkDepartment();
+        checkChargingDepartment();
+        if ("@ViewBag.neworupdate" == "Edit") {
+
+            $("#DepartmentListId").append("<option val='@ViewBag.varDepartmentId' selected>@ViewBag.varDepartmentName</option>").val("@ViewBag.varDepartmentId").trigger('change');
+            $("#ChargingDepartmentId").append("<option val='@ViewBag.varChargingDepartmentId' selected>@ViewBag.varChargingDepartmentName</option>").val("@ViewBag.varChargingDepartmentId").trigger('change');
+
+
+        }
+
+
+    });
+
+</script>

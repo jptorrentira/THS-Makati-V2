@@ -1,0 +1,521 @@
+﻿@model ShuttleService.Models.Trip
+
+@{
+    ViewData["Title"] = "Trip";
+
+    @using Microsoft.AspNetCore.Antiforgery
+    @inject IAntiforgery antiforgery
+    var tokenSet = antiforgery.GetAndStoreTokens(Context);
+}
+<style>
+
+    .clockpicker-popover {
+        z-index: 99992 !important;
+    }
+
+    .select2-container {
+        z-index: 99992 !important;
+    }
+
+    #createTrip {
+        z-index: 99991 !important;
+    }
+</style>
+
+
+@*@{
+    foreach(var tes1 in ViewData["ReservationTypeIdList"] as IEnumerable<ShuttleService.Models.ReservationType>)
+    {
+       <label>@tes1.Description</label>
+    }
+
+}*@
+
+    <div class="wrapper-content row">
+        <div class="col-md-6 pull-left">
+            <h4>Driver/Vehicle Schedule - <red style="color:red">@ViewBag.dtimestamp</red></h4>
+        </div>
+
+        <div class="col-md-6 ">
+            <div class="btn-group pull-right">
+                @if (ViewBag.SMSLog <= 0)
+                {
+                    <button type="button" class="btn btn-w-m btn-info smsbtn " onclick="SendSMSModal();">Send SMS Summary</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-w-m btn-info smsbtn " onclick="SendSMSModal();">Re-Send SMS Summary</button>
+                }
+                <button type="button" class="btn btn-w-m btn-danger " onclick="GoBack('@Url.Content("~/trips")')">Back</button>
+            </div>
+        </div>
+
+        @*<div class="col-md-2">
+                <button type="button" class="btn btn-w-m btn-primary btn-block" onclick="Reservation();">Add New Trip</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-w-m btn-success btn-block" onclick="Reservation();">View Trips</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-w-m btn-danger btn-block" onclick="GoBack('@Url.Content("~/shuttlepassengers")')">Back</button>
+            </div>*@
+    </div>
+
+    <div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+
+        <div class="">
+
+            <div class="row">
+                <div class=" col-sm-6">
+
+
+                    <label>Status</label>
+                    <select id="filterStatus" class="form-control input-sm select2" onchange="checkStatus()" name="filterStatus">
+                        <option value="All" selected>All</option>
+                        <option value="Approved">Approved</option>
+                        @* <option value="Cancelled">Cancelled</option>*@
+                        <option value="For Approval">For Approval</option>
+                        <option value="Reserved">Reserved</option>
+                        <option value="Cancelled/Declined">Cancelled/Declined</option>
+                        <option value="Closed">Closed</option>
+                        <option value="Surveyed">Surveyed</option>
+                    </select>
+
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class=" col-sm-12">
+                    <label style="font-style:italic;">Driver/Vehicle Reservations</label>
+                    <br />
+                    <table id="tableDriverVehicle" class="table table-striped table-bordered table-hover text-center table100 ">
+                        <thead>
+                            <tr>
+                                <th class="text-center ebeTable">
+                                    Action
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Request No
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Requested By
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Request Date/Time
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Origin
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Destination
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Time
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Instruction
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Purpose
+                                </th>
+                                <th class="text-center ebeTable">
+                                    No. Of Passengers
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Assigned Driver
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Assigned Vehicle
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Status
+                                </th>
+                                <th class="text-center ebeTable">
+                                    Remarks
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="modal fade" id="ModalCancelDeclineRemarks" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content modal-col-red">
+                    <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                        <h4 class="modal-title" style="font-size: 15px;">Please provide reason</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <label id="CancelDeclineTitle"></label>
+                            <input type="hidden" class="form-control" id="CancelDeclineId" value="0" />
+                            <input type="hidden" class="form-control" id="CancelDeclineMode" value="0" />
+                            <input type="text" class="form-control" id="CancelDeclineReason" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="loaded">
+                            <button type="button" class="btn btn-danger waves-effect" id="btnCancelDeclineGroup" onclick="CancelDeclineTrip();">Proceed</button>
+
+                            <button type="button" class="btn btn-primary waves-effect" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="modal fade" id="SendSMSModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content modal-col-red">
+                    <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                        <h4 class="modal-title" style="font-size: 15px;">SMS Summary</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <textarea class="form-control" id="smsTextarea" cols="70" rows="30"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="loaded">
+                            <button type="button" class="btn btn-success waves-effect" onclick="SendSMS();">Send SMS</button>
+
+                            <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+    @section Scripts {
+        <script>
+
+        </script>
+    }
+
+    <script>
+
+    var reloader = 0;
+   $('#tableDriverVehicle').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+         "searching": false,
+         "ordering": false,
+        "scrollX": true,
+        "bLengthChange": false,
+        "pageLength": 100,
+        "ajax": {
+            "url": "@Url.Content("~/driverpassengers/CheckPassengerReservationAdmin")",
+            "type": "POST",
+            "data": function (d) {
+                var dtimestamp = @ViewBag.unixtime;
+                d.triptype = "morning";
+                d.timestamp = dtimestamp / 1000;
+                d.filterstatus = $("#filterStatus").val();
+            }
+         },
+
+        
+                                           
+                                            
+                                            
+
+
+
+        "columns": [
+            //{ "data": "action", title: "Action", width: "5%", orderable: false },
+            {
+                title: "Action",
+                data: null,
+                orderable: false,
+                width: "5%",
+                className: "center",
+                render: function (data, type, full, meta) {
+                    var btn = "";
+                    if (data["status"] == "2" || data["status"] == "9") {
+                        //btn = btn + `<a href='"@Url.Content("~/trips")"/AssignTrip?t=` + data["id"] + `&tempid=` + data["tempTransactionId"] + `&d=` + data["serviceDateTimeStamp"] + `'  class='btn btn-block btn-sm btn-primary' > Manage Trip </a>`;
+                        btn = btn + `<a href='@Url.Content("~/trips/AssignTrip")?t=` + data["id"] + `&tempid=` + data["tempTransactionId"] + `&d=` + data["serviceDateTimeStamp"] + `'  class='btn btn-block btn-sm btn-primary' > Manage Trip </a>`;
+                        btn = btn + "<a href='javascript:void(0);'  onClick='cancelTrip(" + data["id"] + ")'   class='btn btn-block btn-sm btn-danger' > Cancel </a>";
+                        btn = btn + "<a href='javascript:void(0);'  onClick='declineTrip(" + data["id"] + ")'    class='btn btn-block btn-sm btn-warning' > Decline </a>";
+                    }
+                    if (data["status"] == "9") {
+                        btn = btn + "<a href='javascript:void(0);' onClick='closeTrip(" + data["id"] + ")'    class='btn btn-block btn-sm btn-success' > Close Ticket </a>";
+                    }
+                    return btn;
+                }
+            },
+            { "data": "no", title: "Request No",width: "5%", orderable: false},
+            { "data": "name", title: "Requested By", width: "20%", orderable: false },
+            { "data": "requestDateTime", title: "Request Date/Time", width: "15%", orderable: false },
+            { "data": "origin", title: "Origin", width: "15%", orderable: false },
+            { "data": "destination", title: "Destination", width: "20%", orderable: false },
+            { "data": "time", title: "Time", width: "10%", orderable: false },
+            { "data": "instruction", title: "Instruction", width: "20%", orderable: false },
+            { "data": "purpose", title: "Purpose", width: "20%", orderable: false },
+            { "data": "passengerCount", title: "No. Of Passengers", width: "20%", orderable: false },
+            { "data": "assignedDriver", title: "Assigned Driver", width: "20%", orderable: false },
+            { "data": "assignedVehicle", title: "Assigned Vehicle", width: "15%", orderable: false },
+            { "data": "statusDescription", title: "Status", width: "15%", orderable: false },
+            { "data": "remarksTrip", title: "Remarks", width: "15%", orderable: false }
+        ]
+        ,
+        'select': {
+            'style': 'single'
+        },
+         "order": [[1, "desc"]],
+         "initComplete": function (settings, json) {
+             if (reloader == 0) {
+                 reloader = 1;
+                 var myVar = setInterval(function () {
+                     $('#tableDriverVehicle').DataTable().columns.adjust().draw();
+                     clearInterval(myVar);
+                 }, 500);
+
+             }
+         }
+            });
+
+
+            function checkStatus() {
+                $('#tableDriverVehicle').DataTable().ajax.reload();
+            }
+    </script>
+
+    <script>
+
+    function cancelTrip(id) {
+
+            CancelGroup(1,id);
+    }
+    function declineTrip(id) {
+
+
+            CancelGroup(2,id);
+    }
+
+    function CancelDeclineTrip() {
+
+        if ($.trim($("#CancelDeclineReason").val()) == "") {
+            swalAlertOnly("Error", "Please provide reason", "error");
+            return false;
+        } else {
+
+                    var mode = $("#CancelDeclineMode").val();
+                    var title = "";
+
+                    if (mode == 1) {
+                        title = "Cancel";
+                    } else if (mode == 2) {
+                        title = "Decline";
+                    }
+
+
+                    swal({
+                        title: "Are you sure?",
+                        text: "This will " + title+" all the person(s) inside this Transaction",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#18a689",
+                        confirmButtonText: "Yes, " + title+" it!",
+                        closeOnConfirm: false
+                    }, function () {
+
+                        Proceed($("#CancelDeclineMode").val(), $("#CancelDeclineId").val());
+
+                            });
+        }
+    }
+
+
+    function CancelGroup(mode,id) {
+        $("#ModalCancelDeclineRemarks").modal("show");
+        $("#CancelDeclineId").val(id);
+        $("#CancelDeclineMode").val(mode);
+        $("#CancelDeclineReason").val("");
+
+
+        if (mode == 1) {
+            $("#CancelDeclineTitle").text("Cancel Reason:");
+        }
+        else if (id == 2) {
+            $("#CancelDeclineTitle").text("Decline Reason:");
+        }
+
+
+    }
+
+    function Proceed(method, id) {
+
+        $("#ModalLoadingSMS").modal("show");
+        $("#ModalLoadingSMS").css('display', 'block');
+        var _url = "@Url.Content("~/driverpassengers/DeclineCancel/")" + id ;
+
+
+        $.ajax({
+                type: "POST",
+                url: _url,
+                data: "id=" + id + "&method=" + method+ "&CancelDeclineReason=" + $("#CancelDeclineReason").val(),
+                //"contentType": "application/json; charset=utf-8",
+                dataType: "JSON",
+                success: function (data, textStatus, jqXHR) {
+                    console.log(data);
+                    if (data.success == 1) {
+
+
+                        $("#ModalLoadingSMS").css('display', 'none');
+                        $("#ModalCancelDeclineRemarks").modal("hide");
+                        $("#CancelDeclineId").val("");
+                        $("#CancelDeclineMode").val("");
+                        $("#CancelDeclineReason").val("");
+                        swalAlertOnly("Success", data.message, "success");
+
+                        //if()
+                        $('#tableDriverVehicle').DataTable().clear().draw();
+                        $('#tableDriverVehicle').DataTable().ajax.reload();
+
+
+                    } else {
+
+
+                        $("#ModalLoadingSMS").css('display', 'none');
+                        swalAlertOnly("Error", data.message, "error");
+                    }
+                }
+        });
+
+    }
+
+    </script>
+
+    <script>
+
+     function SendSMS() {
+            $(".LoadingSMSLabel").text("Sending SMS Summary");
+            $("#ModalLoadingSMS").modal("show");
+            $("#ModalLoadingSMS").css('display', 'block');
+              $.ajax(
+                  {
+                    type: "POST",
+                    url: '@Url.Action("SendSMSGroup", "Trips")',
+                    dataType: 'json',
+                    data: {
+                        timestamp: '@ViewBag.unixtimeFormatted',
+                        smsText: $("#smsTextarea").val(),
+                    },
+                      error: function (data) {
+                          $("#ModalLoadingSMS").modal("hide");
+                          $("#ModalLoadingSMS").css('display', 'none');
+                        console.log(data);
+                    },
+                      success: function (data) {
+                          $("#ModalLoadingSMS").modal("hide");
+                          $("#ModalLoadingSMS").css('display', 'none');
+                         if (data.message === "1") {
+                             $(".smsbtn").text("Re-Send SMS Summary");
+                             $("#SendSMSModal").modal("hide");
+                             swalAlertOnly("Success", "SMS Sent Successfully!", "success");
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                      }
+
+                  });
+    }
+
+     function SendSMSModal() {
+        $("#smsTextarea").val('');
+               $.ajax(
+                  {
+                    type: "POST",
+                    url: '@Url.Action("SendSMSGroupShow", "Trips")',
+                    dataType: 'json',
+                    data: {
+                        timestamp: '@ViewBag.unixtimeFormatted',
+                    },
+                      error: function (data) {
+                        console.log(data);
+                    },
+                      success: function (data) {
+                          if (data.returnSuccess == 1) {
+                              $("#smsTextarea").val(data.message);
+                             $("#SendSMSModal").modal("show");
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                      }
+
+                  });
+
+    }
+
+
+
+    function closeTrip(id) {
+
+
+            var _link = "@Url.Content("~/DriverPassengers/closeTicket")?id=" + id;
+            swal({
+                title: "Are you sure to close this ticket?",
+                text: "This will close the ticket and generate survey to the requestor.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Proceed!",
+                closeOnConfirm: false
+            }, function () {
+
+                $("#ModalReturnVAF").modal("hide");
+                $("#ModalLoading").modal("show");
+                $("#ModalLoading").css('display', 'block');
+                $.ajax({
+                    type: "POST",
+                    url: _link,
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON", data: id,
+                    headers: {
+                        '@tokenSet.HeaderName' : '@tokenSet.RequestToken'
+                    },
+                    success: function (data, textStatus, jqXHR) {
+
+                        $("#ModalLoading").css('display', 'none');
+                        if (data.success == 1) {
+                            //reload the page
+                            swal({
+                                title: "Success",
+                                text: "Ticket Closed",
+                                type: "success"
+                            },
+                                function () {
+                                    checkStatus();
+                                    checkSurveys();
+                                });
+                            //end reload the page
+
+                        } else {
+
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                    }
+                });
+
+            });
+    }
+    </script>

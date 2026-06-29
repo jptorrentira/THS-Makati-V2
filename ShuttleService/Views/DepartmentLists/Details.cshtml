@@ -1,0 +1,54 @@
+﻿@model ShuttleService.Models.DepartmentList
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>DepartmentList</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartmentName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DepartmentName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ShortName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ShortName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EncodedBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EncodedBy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LastModifiedBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LastModifiedBy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EncodeDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EncodeDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ModifyDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ModifyDate)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

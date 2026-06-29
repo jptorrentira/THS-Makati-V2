@@ -1,0 +1,164 @@
+﻿
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="wrapper wrapper-content animated">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5 style="color:firebrick">Driver/Service Reservation Calendar </h5>
+                </div>
+                <div class="ibox-content">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+
+    $(document).ready(function () {
+        
+
+
+
+        /* initialize the calendar
+      -----------------------------------------------------------------*/
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+        var eventArray = [];
+
+
+
+        //eventArray.push('Long Event 2');
+        //eventDateArray.push('2019-10-17');
+
+
+
+
+        var calendarView = $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                //right: 'month'
+            },
+            displayEventTime: false,
+            dayClick: function (date, jsEvent, view) {
+                var dateToday = new Date();
+                //if (dateToday >= date) {
+                //    alert('FUCKED');
+                //} else {
+
+                $("#loading").modal('show');
+
+                window.location.href = "driverpassengers/details?t=sr&d=" + (date / 1000);
+                //}
+                //alert('Clicked on: ' + date.format());
+            },
+            editable: false,
+            droppable: false, // this allows things to be dropped onto the calendar
+            drop: function () {
+            },
+            eventLimit: 10, // for all non-TimeGrid views
+            views: {
+                timeGrid: {
+                    eventLimit: 10 // adjust to 6 only for timeGridWeek/timeGridDay
+                }
+            },
+            events: []
+        });
+
+        eventArray = [
+            { title: 'New event', start: new Date() },
+            { title: 'New event', start: new Date() }
+        ];
+
+        //$('#calendar').fullCalendar('renderEvent', eventArray, true);
+
+        //$('#calendar').fullCalendar('addEventSource', eventArray);
+
+        $('.fc-prev-button').click(function () {
+            LoadCalendar(1);
+        });
+
+        $('.fc-next-button').click(function () {
+            LoadCalendar(1);
+        });
+
+
+
+
+        LoadCalendar(2);
+
+    });
+
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+
+
+
+
+
+    </script>
+
+}
+
+<script>
+
+
+
+
+    function LoadCalendar(e) {
+        var urlString = "";
+        if (e == 1) {
+            urlString = "@Url.Content("~/driverpassengers/ReloadCalendar")" + "?dateFilter=" + $('#calendar').fullCalendar('getDate').format() + "&method=shuttle&e=2";
+        } else {
+            var date = new Date();
+            var d = date.getDate();
+            var m = date.getMonth();
+            var y = date.getFullYear();
+
+            urlString = "@Url.Content("~/driverpassengers/ReloadCalendar")" + "?dateFilter=" + y + '-' + ("0" + (m + 1)).slice(-2) + '-' + ("0" + d).slice(-2) + "&method=shuttle&e=1";
+        }
+        //alert();
+
+        $.ajax({
+            type: "POST",
+            url: urlString,
+            //"contentType": "application/json; charset=utf-8",
+            dataType: "JSON",
+            success: function (data, textStatus, jqXHR) {
+                if (data.status == "OK") {
+                    $('#calendar').fullCalendar('removeEvents');
+                    var events = [];
+                    $.each(data.events, function (index, value) {
+                        //console.log(value);
+                        events.push({
+                            title: value[0]['title'],
+                            start: value[0]['start'],
+                            //all data
+                        });
+                        //console.log(value)
+                    });
+                   $('#calendar').fullCalendar('addEventSource', events);
+                }
+                else {
+                    //alert(data.message);
+                }
+            }
+        });
+    }
+
+
+</script>

@@ -1,0 +1,352 @@
+﻿@{
+    ViewData["Title"] = "Vehicle Monitoring";
+}
+<style>
+    .select2-container {
+        z-index: 9999 !important;
+    }
+
+        .select2-container .select2-dropdown {
+            z-index: 99999 !important;
+        }
+
+</style>
+<div class="wrapper-content">
+    <div>
+        <h4>Vehicle Monitoring</h4>
+    </div>
+    <div class="btn-group pull-left" style="margin-top: 5px;">
+        <button class="ladda-button btn btn-warning" id="dispatchVehicleBtn" type="button" data-style="expand-left">Dispatch Vehicle</button>
+    </div>
+</div>
+<br />
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+    <div class="">
+        <div class="row">
+            <div class=" col-sm-12">
+                <br />
+                <table id="data_table" class="table table-striped table-bordered table-hover text-center table100"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="DispatchModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header">
+                <label class="modal-title">Dispatch Vehicle</label>
+            </div>
+            <div class="modal-body form-horizontal">
+                <form id="dispatchForm" asp-action="SaveDispatch">
+                    <input type="hidden" id="Id" name="Id" />
+
+                    <div class="form-group ">
+                        <label for="TripDateTime" class="control-label col-md-3">Trip Date & Time:</label>
+                        <div class="col-md-6">
+                            <input type="text" id="TripDateTimeDisplay" class="form-control" readonly />
+                            <input type="hidden" id="TripDateTime" name="TripDateTime" />
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="PlateNumber" class="control-label col-md-3">Plate Number:</label>
+                        <div class="col-md-6">
+                            <select id="PlateNumber" name="PlateNumber" class="form-control select2simple required" asp-items="ViewBag.PlateNumbers">
+                                <option value="" disabled selected>Select Plate Number</option>
+                            </select>
+                            
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="Model" class="control-label col-sm-3">Model:</label>
+                        <div class="col-sm-6">
+                            <input id="Model" name="Model" class="form-control required" readonly/>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="Capacity" class="control-label col-sm-3">Capacity:</label>
+                        <div class="col-sm-6">
+                            <input id="Capacity" name="Capacity" class="form-control required" readonly />
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="DriverId" class="control-label col-md-3">Driver:</label>
+                        <div class="col-md-6">
+                            <select id="DriverId" name="DriverId" class="form-control select2simple required" asp-items="ViewBag.Drivers">
+                                <option value="" disabled selected>Select Driver</option>
+                            </select>
+                            
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="Status" class="control-label col-md-3">Status:</label>
+                        <div class="col-md-6">
+                            <select id="Status" name="Status" class="form-control required">
+                                <option value=""></option>
+                                <option value="Operational">Operational</option>
+                                <option value="Non-Operational">Non-Operational</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="Origin" class="control-label col-sm-3">Origin:</label>
+                        <div class="col-sm-6">
+                            <input id="Origin" name="Origin" class="form-control required" placeholder="Origin of trip"/>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="Destination" class="control-label col-sm-3">Destination:</label>
+                        <div class="col-sm-6">
+                            <input id="Destination" name="Destination" class="form-control required" placeholder="Destination of trip" />
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="Remarks" class="control-label col-sm-3">Remarks:</label>
+                        <div class="col-sm-6">
+                            <textarea id="Remarks" name="Remarks" class="form-control" rows="4" placeholder="Additional remarks (optional)" style="resize: none;"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                    <button type="submit" form="dispatchForm" class="btn btn-success waves-effect">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="RemarksModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                <h4 class="modal-title" id="RemarksModalTitle" style="font-size: 15px;"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="remarkContent">
+                    @* Remark Content*@
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.select2simple').select2({
+            dropdownParent: $('#DispatchModal'), // ensures dropdown appears inside modal
+            width: '100%',
+        });
+
+        setTimeout(function () {
+            $('#data_table').DataTable().columns.adjust().responsive.recalc();
+        }, 500);
+
+        $('#TripDateTime').val();
+    });
+
+    var table1 = $('#data_table').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+        "searching": true,
+        "scrollX": true,
+        "bLengthChange": false,
+        "ajax": {
+            "url": "@Url.Content("~/vehiclemonitoring/GetVehicleMonitoringData")",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "action", title: "Action", align: "center", orderable: false },
+            { "data": "tripDateTime", title: "Trip Date & Time", orderable: false },
+            { "data": "plateNumber", title: "Plate Number", orderable: false },
+            { "data": "model", title: "Model", orderable: false },
+            { "data": "capacity", title: "Capacity", orderable: false },
+            { "data": "driver", title: "Driver", orderable: false },
+            { "data": "status", title: "Status", orderable: false },
+            { "data": "origin", title: "Origin", orderable: false },
+            { "data": "destination", title: "Destination", orderable: false }
+        ],
+        dom: 'Bfrtip', // needed for buttons
+        buttons: [
+            {
+                extend: 'csv',
+                text: 'Export CSV',
+                className: 'btn btn-sm btn-secondary',
+                exportOptions: {
+                    columns: ':not(:first-child)' // exclude Action column
+                }
+            },
+            {
+                extend: 'excel',
+                text: 'Export Excel',
+                className: 'btn btn-sm btn-secondary',
+                exportOptions: {
+                    columns: ':not(:first-child)'
+                }
+            },
+            {
+                extend: 'pdf',
+                text: 'Export PDF',
+                className: 'btn btn-sm btn-secondary',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
+                    columns: ':not(:first-child)'
+                }
+            }
+        ],
+        'select': {
+            'style': 'single'
+        },
+        'columnDefs': [
+            {
+                "targets": "_all", // your case first column
+                "className": "text-center",
+            }],
+        "order": [[1, "desc"]]
+    });
+    
+    $('#dispatchVehicleBtn').click(function () {
+        $('#dispatchForm')[0].reset();
+        $('#Id').val(0); // new record
+        $('#PlateNumber').val('').trigger('change');
+        $('#DriverId').val('').trigger('change');
+        $('#Status').val('').trigger('change');
+        $('#Model').val('');
+        $('#Capacity').val('');
+        $('#DispatchModal').modal('show');
+    });
+
+
+    function setCurrentDateTime() {
+        const now = new Date();
+        const pad = n => n < 10 ? '0' + n : n;
+
+        // local ISO without timezone (model binder will parse "yyyy-MM-ddTHH:mm:ss")
+        const localIso = now.getFullYear() + '-' +
+                         pad(now.getMonth() + 1) + '-' +
+                         pad(now.getDate()) + 'T' +
+                         pad(now.getHours()) + ':' +
+                         pad(now.getMinutes()) + ':00';
+
+        // user-friendly display (e.g. "Oct 01 2025 01:52 PM")
+        const options = {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        };
+        const formatted = now.toLocaleString('en-US', options).replace(',', '');
+
+        $("#TripDateTime").val(localIso);          // hidden input sent to server
+        $("#TripDateTimeDisplay").val(formatted);  // visible read-only display
+    }
+
+
+
+    $('#DispatchModal').on('shown.bs.modal', function () {
+        setCurrentDateTime();
+    });
+
+    // When PlateNumber dropdown changes
+    $('#PlateNumber').change(function () {
+        var plateNumber = $(this).val();
+
+        if (plateNumber) {
+            $.ajax({
+                url: '@Url.Action("GetVehicleDetails", "VehicleMonitoring")', // adjust controller name if needed
+                type: 'GET',
+                data: { plateNumber: plateNumber },
+                success: function (response) {
+                    if (response.success) {
+                        $('#Model').val(response.data.model);
+                        $('#Capacity').val(parseInt(response.data.capacity));
+                    } else {
+                        $('#Model').val('');
+                        $('#Capacity').val('');
+                        swalAlertOnly("Error", response.message, "error");
+                    }
+                },
+                error: function (data) {
+                    $('#Model').val('');
+                    $('#Capacity').val('');
+                    swalAlertOnly("Error", "Something went wrong.", "error");
+                }
+            });
+        } else {
+            $('#Model').val('');
+            $('#Capacity').val('');
+        }
+    });
+
+    $('#dispatchForm').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("SaveDispatch", "VehicleMonitoring")',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    $('#DispatchModal').modal('hide');
+                    $('#data_table').DataTable().ajax.reload(null, false); // reload without resetting pagination
+                    swalAlertOnly("Success", "Vehicle dispatched successfully!", "success");
+                } else {
+                    swalAlertOnly("Error", response.message, "error");
+                }
+            },
+            error: function () {
+                swalAlertOnly("Error", "Something went wrong.", "error");
+            }
+        });
+    });
+
+   
+
+    function ViewRemarksAjax(remarks)
+    {
+        $("#RemarksModalTitle").html("Remarks");
+        $("#remarkContent").html(remarks);
+        $("#RemarksModal").modal("show");
+    }
+
+    function EditAjax(id, tripDateTime, plateNumber, model, capacity, driverId, status, origin, destination, remarks) {
+        // Reset the form
+        $('#dispatchForm')[0].reset();
+
+        // Fill inputs
+        $("#Id").val(id);
+        $("#TripDateTime").val(tripDateTime);
+        $("#TripDateTimeDisplay").val(new Date(tripDateTime).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }).replace(',', ''));
+
+        $("#PlateNumber").val(plateNumber).trigger('change');
+        $("#Model").val(model);
+        $("#Capacity").val(capacity);
+        $("#DriverId").val(driverId).trigger('change');
+        $("#Status").val(status).trigger('change');
+        $("#Origin").val(origin);
+        $("#Destination").val(destination);
+        $("#Remarks").val(remarks);
+
+        // Open modal
+        $('#DispatchModal').modal('show');
+    }
+
+</script>

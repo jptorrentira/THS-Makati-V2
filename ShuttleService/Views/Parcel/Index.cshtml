@@ -1,0 +1,865 @@
+﻿@{
+    ViewData["Title"] = "Parcel Delivery";
+    var companyGroupId = ViewBag.UserCompanyGroupId;
+}
+<style>
+    .select2-container {
+        z-index: 9999 !important;
+    }
+
+        .select2-container .select2-dropdown {
+            z-index: 99999 !important;
+        }
+
+    .detail-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .detail-label {
+        flex: 0 0 45%;
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 14px;
+    }
+    .detail-label-dispatch{
+        flex: 0 0 45%;
+        font-weight: lighter;
+        color: #6c757d;
+        font-size: 12px;
+    }
+
+    .detail-value {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .detail-value-dispatch {
+        flex: 1;
+        font-size: 12px;
+        font-weight: lighter;
+    }
+
+    .section-col {
+        border-right: 1px solid #e0e0e0;
+    }
+
+    .modal-body-scroll {
+        max-height: 70vh; /* Adjust to fit screen height */
+        overflow-y: auto;
+        padding-right: 15px; /* prevent content cutoff */
+    }
+
+    .action-dropdown {
+        position: static; /* parent relative so absolute child is positioned properly */
+    }
+    /* Hover-triggered dropdown */
+   
+    .action-dropdown .btn {
+        background-color: #f8f9fa;
+        border: 1px solid #ccc;
+    }
+
+    .action-dropdown .fa {
+        font-size: 14px;
+    }
+
+    /* Dropdown menu styling */
+    .action-dropdown .dropdown-menu {
+        position: absolute !important;
+        top: 100%; /* directly below button */
+        left: 0;
+        z-index: 2000 !important; /* above DataTable but below nav if needed */
+        display: none; /* hide by default */
+        min-width: 160px;
+    }
+    /* Make dropdown items look like colored buttons */
+    .action-dropdown .dropdown-menu {
+        min-width: 160px;
+        padding: 5px;
+        z-index: 10501; /* make sure it overlays DataTable */
+    }
+
+        .action-dropdown .dropdown-menu li {
+            margin: 3px 0;
+        }
+
+        .action-dropdown .dropdown-menu .dropdown-btn {
+            display: block;
+            width: 100%;
+            color: #fff !important;
+            text-align: center;
+            padding: 6px 8px;
+            border-radius: 4px;
+        }
+
+    /* Colored dropdown buttons */
+    .dropdown-menu > li > a.dropdown-btn.btn-info {
+        background-color: #17a2b8 !important;
+        color: #fff !important;
+    }
+
+    .dropdown-menu > li > a.dropdown-btn.btn-success {
+        background-color: #28a745 !important;
+        color: #fff !important;
+    }
+
+    .dropdown-menu > li > a.dropdown-btn.btn-danger {
+        background-color: #dc3545 !important;
+        color: #fff !important;
+    }
+
+    .dropdown-menu > li > a.dropdown-btn.btn-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+    }
+
+    .dropdown-menu > li > a.dropdown-btn.btn-primary {
+        background-color: #007bff !important;
+        color: #fff !important;
+    }
+
+    .dropdown-menu > li > a.dropdown-btn.btn-secondary {
+        background-color: #6c757d !important;
+        color: #fff !important;
+    }
+
+    /* Hover effect */
+    .dropdown-menu > li > a.dropdown-btn:hover {
+        opacity: 0.5;
+        text-decoration: none;
+        color: white !important;
+    }
+
+    .action-dropdown .dropdown-menu > li > a.dropdown-btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 6px 8px;
+        border-radius: 4px;
+        color: #fff !important; /* text color */
+        text-decoration: none;
+    }
+    .action-dropdown .dropdown-menu {
+        position: absolute !important;
+    }
+    .dropdown-menu{
+        max-width: 160px !important;
+    }
+</style>
+
+<div class="wrapper-content">
+    <div>
+        <h4>Parcel Delivery</h4>
+    </div>
+    <div class="btn-group pull-left" style="margin-top: 5px;">
+        <button class="ladda-button btn btn-primary" id="addParcelDeliveryBtn" type="button" data-style="expand-left">Book Parcel Delivery</button>
+    </div>
+</div>
+<br />
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+    <table id="data_table" class="table table-striped table-bordered table-hover text-center table100"></table>
+</div>
+<div class="modal fade" id="parcelDeliveryModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header">
+                <label class="modal-title">Parcel Delivery</label>
+            </div>
+            <div class="modal-body form-horizontal">
+                <form id="parcelDeliveryForm" asp-action="SaveParcelDelivery">
+                    <input type="hidden" id="Id" name="Id" />
+                    <input type="hidden" id="RequestId" name="RequestId" />
+                    <div>
+                        <h3 style="color:#1ab394" id="divCharging">Charging</h3>
+                        <hr />
+                    </div>
+                    <div class="form-group">
+                        <label for="ChargingCompanyId" class="control-label col-sm-3">Charging Company:</label>
+                        <div class="col-sm-8">
+                            <select id="ChargingCompanyId" name="ChargingCompanyId" class="form-control input-sm select2simple" onchange="checkChargingDepartment()" required>
+                                <option value="" selected></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ChargingDepartmentId" class="control-label col-sm-3">Charging Department:</label>
+                        <div class="col-sm-8">
+                            <select id="ChargingDepartmentId" name="ChargingDepartmentId" class="form-control input-sm select2simple" required>
+                                <option value="" selected></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <br />
+                        <h3 style="color:#1ab394" id="divParcelDetails">Parcel Details</h3>
+                        <hr />
+                    </div>
+                    <div class="form-group">
+                        <label for="ParcelCategoryId" class="control-label col-sm-3">Parcel Category:</label>
+                        <div class="col-sm-8">
+                            <select id="ParcelCategoryId" name="ParcelCategoryId" class="form-control input-sm select2" asp-items="ViewBag.ParcelCategoryId" required>
+                                <option value="" selected>--Please Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="DestinationId" class="control-label col-sm-3">Destination</label>
+                        <div class="col-sm-8">
+                            <select name="DestinationId" id="DestinationId" class="form-control input-sm" asp-items="ViewBag.OriginDestinationId" required>
+                                <option value="" selected>--Please Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Destination" class="control-label col-sm-3">Specify:</label>
+                        <div class="col-sm-8">
+                            <input name="Destination" id="Destination" class="form-control " maxlength="35" required />
+                            <span class="text-danger">Maximum input 35 characters</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Recipient" class="control-label col-sm-3">Recipient's Name:</label>
+                        <div class="col-sm-8">
+                            <select id="Recipient" name="Recipient" class="form-control input-sm select2simple" required>
+                                <option default></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="RecipientEmail" class="control-label col-sm-3">Recipient Email:</label>
+                        <div class="col-sm-6">
+                            <input id="RecipientEmail" name="RecipientEmail" class="form-control" type="email" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="RecipientDepartment" class="control-label col-sm-3">Recipient Department:</label>
+                        <div class="col-sm-6">
+                            <input id="RecipientDepartment" name="RecipientDepartment" class="form-control" readonly required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="DateToBeReceived" class="control-label col-sm-3">Date to be Received:</label>
+                        <div class="col-sm-6">
+                            <input id="DateToBeReceived" name="DateToBeReceived" class="form-control" type="date" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="TimeToBeReceived" class="control-label col-sm-3">Time to be Received:</label>
+                        <div class="col-sm-8">
+                            <div class="input-group clockpicker" data-autoclose="true" style="width:25%;">
+                                <input type="text" id="TimeToBeReceived" name="TimeToBeReceived" class="form-control" value="00:00" data-mask="99:99" required>
+                                @*
+                                <span class="input-group-addon">
+                                    <span class="fa fa-clock-o"></span>
+                                </span>
+                                *@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ParcelDescription" class="control-label col-sm-3" required>Parcel Description:</label>
+                        <div class="col-sm-6">
+                            <textarea id="ParcelDescription" name="ParcelDescription" class="form-control" rows="4" style="resize: none;" required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Instruction" class="control-label col-sm-3">Instruction:</label>
+                        <div class="col-sm-6">
+                            <textarea id="Instruction" name="Instruction" class="form-control" rows="4" style="resize: none;" required></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                    <button type="submit" form="parcelDeliveryForm" class="btn btn-success waves-effect">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="viewParcelDeliveryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header">
+                <h4 class="modal-title" id="viewParcelDeliveryModalTitle" style="font-size: 15px;"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row px-3 pb-2">
+                    <!-- LEFT COLUMN -->
+                    <div class="col-md-6 section-col">
+                        <div class="detail-row"><div class="detail-label">Request ID:</div><div id="viewRequestId" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Sender:</div><div id="viewSender" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Parcel Category:</div><div id="viewParcelCategory" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Parcel Description:</div><div id="viewParcelDescription" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Instruction:</div><div id="viewInstruction" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Recipient Name:</div><div id="viewRecipientName" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Recipient Email:</div><div id="viewRecipientEmail" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Recipient Department:</div><div id="viewRecipientDepartment" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Destination Tag:</div><div id="viewDestinationTag" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Destination:</div><div id="viewDestination" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Date & Time to be Received:</div><div id="viewDateTimeToBeReceived" class="detail-value"></div></div>
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="col-md-6">
+                        <div class="detail-row"><div class="detail-label">Status:</div><div id="viewStatus" class="detail-value"></div></div>
+                        <div class="detail-row" id="modifiedSection"><div class="detail-label">Recently Modified By:</div><div id="viewModifiedBy" class="detail-value"></div></div>
+                        <div class="detail-row rejected-section hidden"><div class="detail-label">Rejected By:</div><div id="viewRejectedBy" class="detail-value"></div></div>
+                        <div class="detail-row rejected-section hidden"><div class="detail-label">Rejection Reason:</div><div id="viewRejectedReason" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Actual Dispatched Date:</div><div id="viewActualDispatchDate" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label-dispatch">Assigned Vehicle:</div><div id="viewAssignedVehicle" class="detail-value-dispatch"></div></div>
+                        <div class="detail-row"><div class="detail-label-dispatch">Assigned Driver:</div><div id="viewDriver" class="detail-value-dispatch"></div></div>
+                        <div class="detail-row"><div class="detail-label-dispatch">Dispatch Remarks:</div><div id="viewDispatchRemarks" class="detail-value-dispatch"></div></div>
+                        <div class="detail-row"><div class="detail-label">Actual Received Date:</div><div id="viewActualReceivedDate" class="detail-value"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="dispatchParcelDeliveryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header">
+                <h4 class="modal-title" id="dispatchParcelDeliveryModalTitle" style="font-size: 15px;"></h4>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <div class="row px-3 pb-2">
+                    <div class="col-md-5 section-col">
+                        <div class="detail-row"><div class="detail-label">Status:</div><div id="dispatchStatus" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Request ID:</div><div id="dispatchRequestId" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Sender:</div><div id="dispatchSender" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Parcel Category:</div><div id="dispatchParcelCategory" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Parcel Description:</div><div id="dispatchParcelDescription" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Instruction:</div><div id="dispatchInstruction" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Recipient Name:</div><div id="dispatchRecipientName" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Destination Tag:</div><div id="dispatchDestinationTag" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Destination:</div><div id="dispatchDestination" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Date & Time to be Received:</div><div id="dispatchDateTimeToBeReceived" class="detail-value"></div></div>
+                    </div>
+                    <div class="col-md-7">
+                        <form id="dispatchParcelForm" asp-action="DispatchParcelDelivery">
+                            <h3 style="color: #1A7BB9">Dispatch Form</h3>
+                            <input type="hidden" id="parcelId" name="parcelId" />
+                            <div class="form-group row">
+                                <label for="dispatchDate" class="control-label col-sm-3">Dispatch Date:</label>
+                                <div class="col-sm-6">
+                                    <input id="dispatchDate" name="dispatchDate" class="form-control" type="date" required />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="dispatchTime" class="control-label col-sm-3">Dispatch Time:</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group clockpicker" data-autoclose="true" style="width:25%;">
+                                        <input type="text" id="dispatchTime" name="dispatchTime" class="form-control" value="00:00" data-mask="99:99" required>
+                                        @*
+                                        <span class="input-group-addon">
+                                            <span class="fa fa-clock-o"></span>
+                                        </span>
+                                        *@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="vehicleId" class="control-label col-sm-3">Vehicle:</label>
+                                <div class="col-sm-9">
+                                    <select id="vehicleId" name="vehicleId" class="form-control input-sm" asp-items="ViewBag.VehicleListId" required>
+                                        <option value="" selected>--Please Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="driverId" class="control-label col-sm-3">Driver:</label>
+                                <div class="col-sm-9">
+                                    <select id="driverId" name="driverId" class="form-control input-sm" asp-items="ViewBag.DriverId" required">
+                                        <option value="" selected>--Please Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="dispatchRemarks" class="control-label col-sm-3" required>Parcel Description:</label>
+                                <div class="col-sm-9">
+                                    <textarea id="dispatchRemarks" name="dispatchRemarks" class="form-control" rows="4" style="resize: none;" required></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>       
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                    <button type="submit" form="dispatchParcelForm" class="btn btn-success waves-effect">Dispatch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="rejectParcelDeliveryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header">
+                <h4 class="modal-title" id="rejectParcelDeliveryModalTitle" style="font-size: 15px;"></h4>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <div class="row px-3 pb-2">
+                    <div class="col-md-5 section-col">
+                        <div class="detail-row"><div class="detail-label">Status:</div><div id="rejectStatus" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Request ID:</div><div id="rejectRequestId" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Sender:</div><div id="rejectSender" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Parcel Category:</div><div id="rejectParcelCategory" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Parcel Description:</div><div id="rejectParcelDescription" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Instruction:</div><div id="rejectInstruction" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Recipient Name:</div><div id="rejectRecipientName" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Destination Tag:</div><div id="rejectDestinationTag" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Destination:</div><div id="rejectDestination" class="detail-value"></div></div>
+                        <div class="detail-row"><div class="detail-label">Date & Time to be Received:</div><div id="rejectDateTimeToBeReceived" class="detail-value"></div></div>
+                    </div>
+                    <div class="col-md-7">
+                        <form id="rejectParcelForm" asp-action="RejectParcelDelivery">
+                            <h3 style="color: #dc3545">Reject parcel delivery</h3>
+                            <input type="hidden" id="rejectParcelId" name="rejectParcelId" />
+                            <div class="form-group">
+                                <label for="rejectReason" class="control-label col-sm-3" required>Rejection Reason:</label>
+                                <div class="col-sm-9">
+                                    <textarea id="rejectReason" name="rejectReason" class="form-control" rows="4" style="resize: none;" required></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                    <button type="submit" form="rejectParcelForm" class="btn btn-primary waves-effect">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+        var table1 = $('#data_table').DataTable({
+            "processing": false,
+            "serverSide": true,
+            "autoWidth": false,
+            "searching": true,
+            "scrollX": true,
+            "bLengthChange": false,
+            "ajax": {
+                "url": "@Url.Content("~/parcel/GetParcelDeliveryData")",
+                "type": "POST"
+            },
+            "columns": [
+                { "data": "action", title: "Action", align: "center", orderable: false },
+                { "data": "status", title: "Status", orderable: false },
+                { "data": "requestId", title: "Request Id", orderable: false },
+                { "data": "filedBy", title: "Sender", orderable: false },
+                { "data": "parcelCategory", title: "Parcel Category", orderable: false },
+                { "data": "parcelDescription", title: "Parcel Description", orderable: false },
+                { "data": "recipient", title: "Recipient Name", orderable: false },
+                { "data": "destinationTag", title: "Destination Tag", orderable: false },
+                { "data": "destination", title: "Destination", orderable: false },
+                { "data": "dateTimeToBeReceived", title: "Date & Time to be Received", orderable: false },
+                { "data": "actualDispatchDate", title: "Actual Dispatched Date", orderable: false },
+                { "data": "actualReceivedDate", title: "Actual Received Date", orderable: false },
+            ]
+            ,
+            'select': {
+                'style': 'single'
+            },
+            'columnDefs': [
+                {
+                    "targets": 1, // Status column
+                    "render": function (data) {
+                        let color = '';
+                        switch (data) {
+                            case 'SUBMITTED': color = '#ffc107'; break; // yellow
+                            case 'DISPATCHED': color = '#17a2b8'; break; // blue
+                            case 'DELIVERED': color = '#635cbd'; break; // blue
+                            case 'RECEIVED': color = '#28a745'; break; // green
+                            case 'REJECTED': color = '#dc3545'; break; // red
+                            default: color = '#6c757d'; // gray
+                        }
+                        return `<span style="background-color:${color}; color:white; padding:3px 8px; border-radius:4px;">${data}</span>`;
+                    },
+                    "className": "text-center"
+                },
+                {
+                    "targets": "_all", // your case first column
+                    "className": "text-center",
+                }],
+            "order": [[0, "desc"]]
+        });
+        $('#data_table').on('click', '.action-dropdown .dropdown-toggle', function(e){
+            e.preventDefault();
+            var $btn = $(this);
+            var $dropdown = $btn.siblings('.dropdown-menu');
+
+            // Remove any previous floating dropdown
+            $('.floating-dropdown').remove();
+
+            // Clone dropdown
+            var $floating = $dropdown.clone(true, true).appendTo('body').addClass('floating-dropdown');
+
+            var offset = $btn.offset();
+            $floating.css({
+                display: 'block',
+                top: offset.top + $btn.outerHeight(),
+                left: offset.left,
+                minWidth: $btn.outerWidth(),
+                position: 'absolute',
+                zIndex: 10501
+            });
+
+            // Hide on click outside
+            $(document).one('click', function(){
+                $floating.remove();
+            });
+        });
+
+        
+        $(".select2simple").select2();
+        $("#ChargingCompanyId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getChargingCompanyList?companyGroupId=")" + '@companyGroupId',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+        $("#Recipient").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/GetPeopleCoreEmployeeInfoByEmployeeNoOrName")",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+        $("#Recipient").on('change', function(){
+            $.ajax({
+                type: "POST",
+                url: "@Url.Content("~/employees/GetPeopleCoreEmployeeEmail")?employeeName=" + $("#Recipient").val(),
+                dataType: "JSON",
+                success: function(data)
+                {
+                    $('#RecipientEmail').val(data.email);
+                    $('#RecipientDepartment').val(data.department);
+                }
+            })
+        });
+    })
+    
+    function checkChargingDepartment() {
+        $("#ChargingDepartmentId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getChargingDepartmentList?companyId=")" + $("#ChargingCompanyId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                    q: params.term, // search term
+                    page: params.page
+                };
+            },
+            processResults: function (data, page) {
+                return {
+                    results: data.items
+                };
+            },
+            cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+        $("#ChargingDepartmentId").val("").trigger('change');
+    }
+
+    function setSelect2Value(selector, value, text) {
+        if (value && text) {
+            var option = new Option(text, value, true, true);
+            $(selector).append(option).trigger('change');
+        } else {
+            $(selector).val(null).trigger('change');
+        }
+    }
+
+
+    $('#parcelDeliveryForm').submit(function (e) {
+        e.preventDefault();
+
+        var $form = $(this);
+        var $btn = $form.find('button[type="submit"]');
+
+        // Disable button immediately
+        $btn.prop('disabled', true);
+
+        $.ajax({
+            url: '@Url.Action("SaveParcelDelivery", "Parcel")',
+            type: 'POST',
+            data: $form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    swalAlertOnly("Success", "Parcel delivery successfully saved!", "success");
+                    $('#parcelDeliveryModal').modal('hide');
+                    $('#data_table').DataTable().ajax.reload(null, false);
+                } else {
+                    swalAlertOnly("Error", response.message, "error");
+                    $btn.prop('disabled', false); // re-enable if failed
+                }
+            },
+            error: function () {
+                swalAlertOnly("Error", "Something went wrong.", "error");
+                $btn.prop('disabled', false); // re-enable if error
+            }
+        });
+    });
+
+
+    $('#dispatchParcelForm').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("DispatchParcelDelivery", "Parcel")',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    $('#dispatchParcelDeliveryModal').modal('hide');
+                    $('#data_table').DataTable().ajax.reload(null, false); // reload without resetting pagination
+                    swalAlertOnly("Success", "Parcel delivery has been dispatched!", "success");
+                } else {
+                    swalAlertOnly("Error", response.message, "error");
+                }
+            },
+            error: function () {
+                swalAlertOnly("Error", "Something went wrong.", "error");
+            }
+        });
+    });
+
+    $('#rejectParcelForm').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '@Url.Action("RejectParcelDelivery", "Parcel")',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    $('#rejectParcelDeliveryModal').modal('hide');
+                    $('#data_table').DataTable().ajax.reload(null, false); // reload without resetting pagination
+                    swalAlertOnly("Success", "Parcel delivery has been rejected!", "success");
+                } else {
+                    swalAlertOnly("Error", response.message, "error");
+                }
+            },
+            error: function () {
+                swalAlertOnly("Error", "Something went wrong.", "error");
+            }
+        });
+    });
+
+    $('#addParcelDeliveryBtn').click(function () {
+        $('#parcelDeliveryForm')[0].reset();
+        $('#Id').val(0); // new record
+        $('#ChargingCompanyId').val('').trigger('change');
+        $('#ChargingDepartmentId').val('').trigger('change');
+        $('#ParcelCategoryId').val('').trigger('change');
+        $('#DestinationId').val('').trigger('change');
+        $('#Destination').val('');
+        $('#Recipient').val('');
+        $('#RecipientEmail').val('');
+        $('#RecipientDepartment').val('');
+        $('#DateToBeReceived').val('');
+        $('#TimeToBeReceived').val('');
+        $('#ParcelDescription').val('');
+        $('#Instruction').val('');
+        $('#parcelDeliveryModal').modal('show');
+    });
+
+    function ViewDetailsAjax(id, requestId, status, parcelCategory, parcelDescription, instruction, recipient, recipientEmail, recipientDepartment, destinationTag, destination, 
+        dateTimeToBeReceived, actualDispatchDate, actualReceivedDate, filedBy, filedDate, updatedBy, updatedDate, rejectedBy, rejectedDate, rejectionReason, vehicle, driver, remarks)
+        {
+            $('#viewParcelDeliveryModalTitle').html(`Details of ${requestId}`);
+			$('#viewRequestId').html(requestId);
+			$('#viewSender').html(filedBy + ' <small>(' + filedDate + ')</small>');
+            $('#viewParcelCategory').html(parcelCategory);
+            $('#viewParcelDescription').html(parcelDescription);
+            $('#viewInstruction').html(instruction);
+			$('#viewRecipientName').html(recipient);
+			$('#viewRecipientEmail').html(recipientEmail);
+            $('#viewRecipientDepartment').html(recipientDepartment);
+            $('#viewDestinationTag').html(destinationTag);
+            $('#viewDestination').html(destination);
+            $('#viewStatus').html(status);
+			$('#viewDateTimeToBeReceived').html(dateTimeToBeReceived);
+            $('#viewActualDispatchDate').html(actualDispatchDate);
+            $('#viewAssignedVehicle').html(vehicle);
+            $('#viewDriver').html(driver);
+            $('#viewDispatchRemarks').html(remarks);
+            $('#viewActualReceivedDate').html(actualReceivedDate);
+            if (updatedBy && updatedBy.trim() !== "") {
+                $('#modifiedSection').removeClass('hidden');
+                $('#viewModifiedBy').html(updatedBy + ' <small>(' + updatedDate + ')</small>');
+            } else {
+                $('#modifiedSection').addClass('hidden');
+            }
+            if (status === "REJECTED") {
+                $('.rejected-section').removeClass('hidden');
+                $('#viewRejectedBy').html(rejectedBy + ' <small>(' + rejectedDate + ')</small>');
+                $('#viewRejectedReason').html(rejectionReason);
+            } else {
+                $('.rejected-section').addClass('hidden');
+            }
+
+			$('#viewParcelDeliveryModal').modal('show');
+        }
+
+    function DispatchAjax(id, requestId, status, parcelCategory, parcelDescription, instruction, recipient, destinationTag, destination, dateTimeToBeReceived, filedBy, filedDate)
+    {
+        let today = new Date().toISOString().split('T')[0];
+        let now = new Date().toTimeString().slice(0, 5);
+        $('#dispatchDate').val(today);
+        $('#dispatchTime').val(now);
+
+        $('#dispatchParcelDeliveryModalTitle').html(`Dispatch ${requestId}`);
+        $('#dispatchStatus').html(status);
+        $('#dispatchRequestId').html(requestId);
+        $('#dispatchSender').html(filedBy + ' <small>(' + filedDate + ')</small>');
+        $('#dispatchParcelCategory').html(parcelCategory);
+        $('#dispatchParcelDescription').html(parcelDescription);
+        $('#dispatchInstruction').html(instruction);
+        $('#dispatchRecipientName').html(recipient);
+        $('#dispatchDestinationTag').html(destinationTag);
+        $('#dispatchDestination').html(destination);
+        $('#dispatchDateTimeToBeReceived').html(dateTimeToBeReceived);
+        $('#parcelId').val(id); // set the id for dispatching
+        $('#dispatchParcelDeliveryModal').modal('show');
+    }
+
+    function EditAjax(id, requestId, chargingCompanyId, chargingCompany, chargingDepartmentId, chargingDepartment, parcelCategoryId, destinationTag, destination, recipient, 
+        recipientEmail, recipientDepartment, dateToBeReceived, timeToBeReceived, parcelDescription, instruction)
+    {
+        $('#parcelDeliveryForm')[0].reset();
+        $('#Id').val(id); // new record
+        setSelect2Value("#ChargingCompanyId", chargingCompanyId, chargingCompany)
+        setSelect2Value("#ChargingDepartmentId", chargingDepartmentId, chargingDepartment)
+        $('#ParcelCategoryId').val(parcelCategoryId).trigger('change');
+        $('#DestinationId').val(destinationTag).trigger('change');
+        $('#Destination').val(destination);
+        setSelect2Value("#Recipient", recipient, recipient)
+        $('#RecipientEmail').val(recipientEmail);
+        $('#RecipientDepartment').val(recipientDepartment);
+        $('#DateToBeReceived').val(dateToBeReceived);
+        $('#TimeToBeReceived').val(timeToBeReceived);
+        $('#ParcelDescription').val(parcelDescription);
+        $('#Instruction').val(instruction);
+        $('#parcelDeliveryModal').modal('show');
+    }
+
+    function ReceivedAjax(id){
+		swalConfirm("Confirm Received", "Are you sure you want to mark this parcel as received?", "warning", function(){
+			$.ajax({
+                url: '@Url.Action("ReceivedParcelDelivery", "Parcel")',
+				type: 'POST',
+				data: { id: id },
+				success: function (response) {
+					if (response.success) {
+						$('#data_table').DataTable().ajax.reload(null, false); // reload without resetting pagination
+						swalAlertOnly("Success", "Parcel marked as received!", "success");
+					} else {
+						swalAlertOnly("Error", response.message, "error");
+					}
+				},
+				error: function () {
+					swalAlertOnly("Error", "Something went wrong.", "error");
+				}
+			});
+		});
+    }
+
+    function DeliveredAjax(id){
+        swalConfirm("Confirm Delivered", "Are you sure you want to mark this parcel as delivered?", "warning", function(){
+            $.ajax({
+                url: '@Url.Action("DeliverParcelDelivery", "Parcel")',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    if (response.success) {
+                        $('#data_table').DataTable().ajax.reload(null, false); // reload without resetting pagination
+                        swalAlertOnly("Success", "Parcel marked as delivered!", "success");
+                    } else {
+                        swalAlertOnly("Error", response.message, "error");
+                    }
+                },
+                error: function () {
+                    swalAlertOnly("Error", "Something went wrong.", "error");
+                }
+            });
+        });
+    }
+
+    function RejectAjax(id, requestId, status, parcelCategory, parcelDescription, instruction, recipient, destinationTag, destination, dateTimeToBeReceived, filedBy, filedDate){
+        $('#rejectParcelDeliveryModalTitle').html(`Reject ${requestId}`);
+        $('#rejectStatus').html(status);
+        $('#rejectRequestId').html(requestId);
+        $('#rejectSender').html(filedBy + ' <small>(' + filedDate + ')</small>');
+        $('#rejectParcelCategory').html(parcelCategory);
+        $('#rejectParcelDescription').html(parcelDescription);
+        $('#rejectInstruction').html(instruction);
+        $('#rejectRecipientName').html(recipient);
+        $('#rejectDestinationTag').html(destinationTag);
+        $('#rejectDestination').html(destination);
+        $('#rejectDateTimeToBeReceived').html(dateTimeToBeReceived);
+        $('#rejectParcelId').val(id); // set the id for dispatching
+        $('#rejectParcelDeliveryModal').modal('show');
+    }
+
+</script>

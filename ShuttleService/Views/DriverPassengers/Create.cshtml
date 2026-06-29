@@ -1,0 +1,1104 @@
+﻿@model ShuttleService.Models.DriverPassenger
+@Html.ValidationMessageFor(m => m.CompanyOther)
+@{
+	ViewData["Title"] = "Driver/Vehicle Form";
+	var _dhead = ViewData["DriverPassengerHeaders"] as DriverPassengerHeader;
+
+}
+<style>
+	#tableEmployee_length {
+		visibility: hidden;
+	}
+</style>
+<div class="wrapper-content row">
+	<div class="col-md-6">
+		<h4>Driver/Passenger Form</h4>
+	</div>
+	<div class="col-md-6 ">
+		<div class="btn-group pull-right">
+			@if (ViewBag.OverAllApprover == 1)
+			{
+				<button type="button" class="btn btn-w-m btn-primary" onclick="Submit();">Submit & Approve</button>
+			}
+			else if (_dhead == null)
+			{
+				<button type="button" class="btn btn-w-m btn-primary" onclick="Submit();">Submit</button>
+
+			}
+			else if (_dhead.EmployeeId == ViewBag.EmployeeId)
+			{
+				<button type="button" class="btn btn-w-m btn-primary" onclick="Submit();">Submit</button>
+
+			}
+			@if (ViewBag.FromTrip == "1")
+			{
+
+				<button type="button" class="btn btn-w-m btn-danger" onclick="GoBack('@Url.Content("~/trips/AssignTrip?d=")@ViewBag.dGet&t=@ViewBag.tGet&tempid=@ViewBag.tempid')">Back</button>
+
+			}
+			else
+			{
+				<button type="button" class="btn btn-w-m btn-danger" onclick="GoBack('@Url.Content("~/driverpassengers/details?d=")@ViewBag.dGet')">Back</button>
+
+			}
+		</div>
+	</div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+	<form asp-action="Create" id="ShuttleForm" class="form-horizontal">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<input name="ServiceDateTimeStamp" type="hidden" readonly value="@ViewBag.dGet" />
+		<div class="row ChargingGroup">
+			<div class="col-md-6">
+				<h3 style="color:#1ab394" id="divCharging">Charging</h3>
+				<hr />
+			</div>
+		</div>
+		<div class="row ChargingGroup">
+			<div class="col-md-6">
+				<div class="form-group">
+					<label asp-for="ChargingCompanyId" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<select asp-for="ChargingCompanyId" class="form-control input-sm select2" onchange="checkChargingDepartment()" asp-items="ViewBag.ChargingCompanyId">
+							<option value="" selected>--Please Select--</option>
+						</select>
+
+						<span asp-validation-for="ChargingCompanyId" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label asp-for="ChargingDepartmentId" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<select asp-for="ChargingDepartmentId" class="form-control input-sm select2">
+							<option value="" selected>--Please Select--</option>
+						</select>
+						<span asp-validation-for="ChargingDepartmentId" class="text-danger"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row DestinationGroup">
+			<div class="col-md-6">
+				<h3 style="color:#1ab394">Destination</h3>
+				<hr />
+			</div>
+
+		</div>
+		<div class="row DestinationGroup">
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="control-label col-sm-3">Unplanned Trip</label>
+					<div class="col-sm-8">
+						<select asp-for="UnplannedTrip" id="UnplannedTrip" class="form-control input-sm ">
+							<option value="" selected>--Please Select--</option>
+							<option value="0">No</option>
+							<option value="1">Yes</option>
+						</select>
+						<span asp-validation-for="UnplannedTrip" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-3">Origin</label>
+					<div class="col-sm-8">
+						<select asp-for="OriginId" onChange="checkOrigin();" id="OriginId" class="form-control input-sm " asp-items="ViewBag.OriginDestinationId">
+							<option value="" selected>--Please Select--</option>
+						</select>
+						<span asp-validation-for="OriginId" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-3">Specify</label>
+					<div class="col-sm-8">
+						<input asp-for="Origin" id="Origin" class="form-control " maxlength="35" readonly />
+
+						<span class="text-danger">Maximum input 35 characters</span>
+						<span asp-validation-for="Origin" class="text-danger"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="control-label col-sm-3">Destination</label>
+					<div class="col-sm-8">
+						<select asp-for="DestinationId" onChange="checkDestination();" id="DestinationId" class="form-control input-sm " asp-items="ViewBag.OriginDestinationId">
+							<option value="" selected>--Please Select--</option>
+						</select>
+						<span asp-validation-for="DestinationId" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-3">Specify</label>
+					<div class="col-sm-8">
+						<input asp-for="Destination" id="Destination" class="form-control " maxlength="35" readonly />
+
+						<span class="text-danger">Maximum input 35 characters</span>
+						<span asp-validation-for="Destination" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label id="TripDate" class="control-label col-sm-3">Schedule Date</label>
+					<div class="col-sm-8">
+						<input name="TripDate" readonly value="@ViewBag.dtimestamp" id="TripDate" class="form-control " />
+					</div>
+				</div>
+				<div class="form-group">
+					<label asp-for="TripTimeFrom" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<div class="input-group clockpicker" data-autoclose="true">
+							<input type="text" asp-for="TripTimeFrom" name="TripTimeFrom" class="form-control" value="00:00" data-mask="99:99">
+							<span class="input-group-addon">
+								<span class="fa fa-clock-o"></span>
+							</span>
+						</div>
+						<span asp-validation-for="TripTimeFrom" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label asp-for="TripTimeTo" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<div class="input-group clockpicker" data-autoclose="true">
+							<input type="text" asp-for="TripTimeTo" name="TripTimeTo" class="form-control" value="00:00" data-mask="99:99">
+							<span class="input-group-addon">
+								<span class="fa fa-clock-o"></span>
+							</span>
+						</div>
+
+						<span asp-validation-for="TripTimeTo" class="text-danger"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label asp-for="ServiceTypeId" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<select asp-for="ServiceTypeId" class="form-control input-sm " asp-items="ViewBag.ServiceTypeId">
+							<option value="" selected>--Please Select--</option>
+						</select>
+						<span asp-validation-for="ServiceTypeId" class="text-danger"></span>
+					</div>
+					<div class="col-sm-1"></div>
+					<div class="col-sm-3"></div>
+					<div class="col-sm-8">
+						<small id="noPassengerNote" class="text-secondary" style="display:none;">
+							You have selected <b>No Passenger</b>. Please click the <b>Add Passenger</b> button below to confirm <u>NO PASSENGER</u>.
+						</small>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label asp-for="Instructions" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="Instructions" class="form-control" />
+						<span asp-validation-for="Instructions" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group ">
+					<label asp-for="Purpose" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="Purpose" class="form-control" />
+						<span asp-validation-for="Purpose" class="text-danger"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row PassengerGroup">
+			<div class="col-md-6">
+				<h3 style="color:#1ab394">Passenger Entry</h3>
+				<hr />
+			</div>
+		</div>
+		<div class="row PassengerGroup">
+			<div class="col-md-6">
+				<div class="form-group hidden">
+					<label asp-for="ShuttleId" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<select asp-for="ShuttleId" class="form-control input-sm select2" asp-items="ViewBag.ShuttleId"></select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label asp-for="PassengerTypeId" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<select asp-for="PassengerTypeId" onchange="ValidatePassengerType();" class="form-control input-sm lookupElement select2" asp-items="ViewBag.PassengerTypeId"></select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label asp-for="EmployeeNo" class="control-label col-sm-3"></label>
+					<div class="col-sm-5">
+						<input asp-for="EmployeeNo" class="form-control lookupElement" onblur="$('#EmployeeSearch').trigger('click');" />
+						<span asp-validation-for="EmployeeNo" class="text-danger"></span>
+					</div>
+					<div class="btn-group clear-search" role="group">
+						<a onclick="resetLookupElement();" class="btn btn-sm btn-danger" data-style="expand-left">Clear</a>
+						<a id="EmployeeSearch" class="ladda-button btn btn-sm btn-primary" data-style="expand-left">Search</a>
+					</div>
+				</div>
+				<div class="form-group" id="divForCompanyID">
+					<label asp-for="CompanyListId" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<select asp-for="CompanyListId" class="form-control input-sm lookupElement select2" asp-items="ViewBag.CompanyId" onchange="CheckCompanyList();">
+							<option value="" selected>--Please Select--</option>
+						</select>
+						<span asp-validation-for="CompanyListId" class="text-danger"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label asp-for="CompanyOther" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="CompanyOther" id="CompanyOther" disabled class="form-control lookupElement" />
+						<span asp-validation-for="CompanyOther" class="text-danger"></span>
+					</div>
+				</div>
+
+				<hr />
+				<div class="form-group">
+					<label asp-for="FirstName" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="FirstName" id="FirstName" class="form-control lookupElement" />
+						<span asp-validation-for="FirstName" class="text-danger"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label asp-for="MiddleName" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="MiddleName" id="MiddleName" class="form-control lookupElement" />
+						<span asp-validation-for="MiddleName" class="text-danger"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label asp-for="LastName" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="LastName" id="LastName" class="form-control lookupElement" />
+						<span asp-validation-for="LastName" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-8">
+					</div>
+					<div class="btn-group clear-search" role="group">
+						<a onclick="resetLookupElement();" class="btn btn-sm btn-danger" data-style="expand-left">Clear</a>
+						<a id="EmployeeSearchByName" onclick="ShowEmployeeByName();" class="btn btn-sm btn-primary" data-style="expand-left">Search</a>
+					</div>
+				</div>
+
+				<hr />
+
+				<div class="form-group ContactNoGroup hidden lookupElement">
+					<label asp-for="Nationality" class="control-label col-md-3"></label>
+					<div class="col-md-8">
+						<select asp-for="Nationality" class="form-control input-sm lookupElement select2" asp-items="ViewBag.Nationality"></select>
+					</div>
+				</div>
+
+				<div class="form-group ContactNoGroup hidden lookupElement">
+					<label asp-for="Gender" class="control-label col-md-3"></label>
+					<div class="col-md-8">
+						<select asp-for="Gender" class="form-control select2">
+							<option value="Male">Male</option>
+							<option value="Female">Female</option>
+						</select>
+						<span asp-validation-for="Gender" class="text-danger"></span>
+					</div>
+				</div>
+
+
+				<div class="form-group ContactNoGroup hidden">
+					<label asp-for="ContactNo" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="ContactNo" class="form-control lookupElement" />
+						<span asp-validation-for="ContactNo" class="text-danger"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label asp-for="Position" class="control-label col-sm-3"></label>
+					<div class="col-sm-8">
+						<input asp-for="Position" class="form-control lookupElement" />
+						<span asp-validation-for="Position" class="text-danger"></span>
+					</div>
+				</div>
+
+
+
+
+			</div>
+			<div class="col-md-6">
+			</div>
+
+			<div>
+				@*<a asp-action="Index">Back to List</a>*@
+			</div>
+		</div>
+		<div class="row PassengerGroup">
+			<div class="form-group pull-right">
+				<a id="btnAddToList" class="ladda-button btn btn-primary" data-style="expand-left">Add Passenger</a>
+			</div>
+		</div>
+	</form>
+	<div class="PassengerGroup">
+		<div class="row">
+			<div class=" col-sm-12">
+				<label>Lists of Passengers</label>
+				<br />
+				<table id="data_table_rec1" class="table table-striped table-bordered table-hover text-center table100"></table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="ModalEmployeeFilter" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog modal-md" role="document">
+		<div class="modal-content modal-col-red">
+			<div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+				<h4 class="modal-title" id="ModalTitle" style="font-size: 15px;">Passenger Name Filter</h4>
+			</div>
+			<div class="modal-body">
+				<table id="tableEmployee" class="table table-striped table-bordered table-hover table100">
+					<thead>
+						<tr>
+							<th>Action</th>
+							<th>First Name</th>
+							<th>Middle Name</th>
+							<th>Last Name</th>
+						</tr>
+					</thead>
+					<tfoot></tfoot>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<div class="loaded">
+					<button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+
+}
+
+<script>
+
+	function functionToRun(e) {
+		var confirmationMessage = "\o/";
+		(e || window.event).returnValue = confirmationMessage; //Gecko + IE
+		return confirmationMessage;
+	}
+
+
+	$('#EmployeeSearch').click(function () {
+
+		if ($("#EmployeeNo").is('[disabled]')== false) {
+			if ($.trim($("#EmployeeNo").val()) == "") {
+
+				swalAlertOnly("Error", "Invalid employee number", "error");
+			}
+			else {
+				// Start loading
+				$('#EmployeeSearch').ladda().ladda('start');
+
+
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Content("~/employees/checkEmployee")?employeeId=" + $.trim($("#EmployeeNo").val()  +"&d=@ViewBag.dGet"),
+					//"contentType": "application/json; charset=utf-8",
+					dataType: "JSON",
+					success: function (data, textStatus, jqXHR) {
+						if (data.error != 1) {
+
+							$("#Gender").val(data['data'].gender).trigger("change");
+							$("#Nationality").val(data.nationalityName).trigger("change");
+							$("#PassengerTypeId").val("1").trigger('change');
+							$("#FirstName").val(data['data'].firstName);
+							$("#MiddleName").val(data['data'].middleName);
+							$("#LastName").val(data['data'].lastName);
+							$("#Position").val(data['data'].position);
+							$("#CompanyListId").val(data['data'].companyListId).change();
+							//$("#ChargingCompanyId").val(data['data'].chargingCompanyId).change();
+							//$("#ChargingDepartmentId").append("<option value='" + data.chargingDepartmentId + "'>" + data.chargingDepartment + "</option>").val(data.chargingDepartmentId).change();
+
+							//default charging company and department of the requestor applied 02-13-2020
+
+							$("#ChargingCompanyId").val('@ViewBag.defaultChargingCompanyId').change();
+							$("#ChargingDepartmentId").append("<option value='@ViewBag.defaultChargingDepartmentId'>@ViewBag.defaultChargingDepartmentName</option>").val('@ViewBag.defaultChargingDepartmentId').change();
+
+							//end
+
+
+							$("#ContactNo").val(data['data'].mobileNumber).change();
+							CheckCompanyList();
+							DisableLookupElement();
+
+						} else {
+							$("#Name").val("");
+							$("#Position").val("");
+							$("#CompanyListId").val("");
+							swalAlertOnly("Error", data["message"], "error");
+						}
+
+						$('#EmployeeSearch').ladda().ladda('stop');
+					}
+				});
+
+
+			}
+		}
+	});
+
+
+
+	//$('.input-daterange').datepicker({
+	//    keyboardNavigation: false,
+	//    forceParse: false,
+	//    autoclose: true
+	//});
+
+	$('.datepicker').datepicker({
+		keyboardNavigation: false,
+		forceParse: false,
+		autoclose: true,
+		todayHighlight: false,
+		startDate: "@ViewBag.dtimestamp"
+	});
+
+
+
+	var table1 = $('#data_table_rec1').DataTable({
+		"processing": false,
+		"serverSide": true,
+		"autoWidth": false,
+		"searching": false,
+		"scrollX": true,
+		"bLengthChange": false,
+		"ajax": {
+			"url": "@Url.Content("~/driverpassengers/ShowPassengerLists")",
+			"type": "POST",
+			"data": function (d) {
+				var dtimestamp = @ViewBag.dget;
+				var tid = @ViewBag.tget;
+				d.timestamp = dtimestamp;
+				d.tid = tid;
+				d.trip = 0;
+			}
+		},
+		"columns": [
+			{ "data": "id", title: "Action",width: "5%",align:"center", orderable: false},
+			{ "data": "company", title: "Company", orderable: false },
+			{ "data": "employeeID", title: "Employee No", orderable: false },
+			{ "data": "passengerName", title: "Passenger Name", orderable: false },
+			{ "data": "position", title: "Position", orderable: false },
+			{ "data": "instruction", title: "Instruction", orderable: false },
+			{ "data": "purpose", title: "Purpose", orderable: false, visible: true },
+			{ "data": "remarks", title: "Remarks", orderable: false, visible: false },
+			{ "data": "serviceType", title: "Service Type", orderable: false },
+			{ "data": "originTag", title: "Origin Tag", orderable: false },
+			{ "data": "origin", title: "Origin", orderable: false },
+			{ "data": "destinationTag", title: "Destination Tag", orderable: false },
+			{ "data": "destination", title: "Destination", orderable: false },
+			{ "data": "tripTimeFrom", title: "From", orderable: false },
+			{ "data": "tripTimeTo", title: "To", orderable: false },
+			{ "data": "statusDescription", title: "Status", orderable: false }
+		]
+		,
+		'select': {
+			'style': 'single'
+		},
+		'columnDefs': [
+			{
+				"targets": "_all", // your case first column
+				"className": "text-center",
+			}],
+		"order": [[0, "desc"]]
+	});
+
+
+
+
+	var atl = $('#btnAddToList').ladda();
+	atl.click(function () {
+
+		$('#CompanyOther').validate();
+		$('#EmployeeNo').validate();
+		$("#ChargingCompanyId").select2('destroy');
+		$("#ChargingDepartmentId").select2('destroy');
+		$("#CompanyListId").select2('destroy');
+
+
+		$("#ChargingCompanyId").removeAttr("disabled");
+		$("#ChargingDepartmentId").removeAttr("disabled");
+
+
+
+		if ($("#btnAddToList").is('[disabled]') == false) {
+			if ($("form").valid()) {
+
+				$("#ModalLoading").modal("show");
+				$("#ModalLoading").css('display', 'block');
+				$(".select2").select2({ placeholder: "Please Select" });
+				EnableLookupElement();
+				// Start loading
+				atl.ladda('start');
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Content("~/driverpassengers/create")?tid=@ViewBag.tget&TempTransactionId=@ViewBag.tempid&d=@ViewBag.dget" ,
+					data: $("#ShuttleForm").serialize(),
+					//"contentType": "application/json; charset=utf-8",
+					dataType: "JSON",
+					success: function (data, textStatus, jqXHR) {
+						$("#ModalLoading").css('display', 'none');
+
+						if (data.success == 1) {
+							$('#ShuttleForm').trigger("reset");
+                            $(".select2").val(null).trigger("change");
+
+							ValidatePassengerType();
+							CheckCompanyList();
+
+
+							$('#data_table_rec1').DataTable().clear().draw();
+							$('#data_table_rec1').DataTable().ajax.reload();
+
+
+
+							window.removeEventListener("beforeunload", functionToRun);
+							//reload the page
+								swal({
+												title: "Success",
+												text: data.message,
+												type: "success"
+											},
+									function () {
+
+
+											window.location.href = "@Url.Content("~/driverpassengers/create")" + "?t=" + data.tid + "&tempid=" + data.tempid + "&d=@ViewBag.dget" + "&ft=@ViewBag.FromTrip";
+
+								});
+							//end reload the page
+
+
+						} else {
+							swalAlertOnly("Error", data.message, "error");
+							DisableLookupElement();
+						}
+
+						atl.ladda('stop');
+
+
+						var checkifapprover = "@ViewBag.OverAllApprover";
+
+						if (checkifapprover != "1") {
+							$("#ChargingCompanyId").attr("disabled", true);
+							$("#ChargingDepartmentId").attr("disabled", true);
+						}
+
+
+
+					}
+				});
+
+
+			}
+			else {
+				$('.field-validation-error:first').parent().find(':input').focus();
+
+				$(".select2").select2({ placeholder: "Please Select" });
+			}
+		}
+
+	});
+
+	function ShowEmployeeByName() {
+
+
+
+		if ($.trim($("#FirstName").val()) == "" && $.trim($("#MiddleName").val()) == "" && $.trim($("#LastName").val()) == "") {
+			swalAlertOnly("Error", "Invalid employee name", "error");
+		}
+		else {
+
+			$('#tableEmployee').DataTable().clear().draw();
+			$('#tableEmployee').DataTable().ajax.reload();
+			$("#ModalEmployeeFilter").modal("show");
+			setTimeout(function () {
+				$('#tableEmployee').DataTable().columns.adjust().responsive.recalc();
+			},500);
+		}
+	}
+
+	$('#tableEmployee').DataTable({
+		"processing": false,
+		"serverSide": true,
+		"autoWidth": false,
+		"searching": false,
+		"scrollX": true,
+		"bLengthChange": false,
+		"ajax": {
+			"url": "@Url.Content("~/employees/checkEmployeeByName")",
+			"type": "POST",
+			"data": function (d) {
+			d.firstName = $("#FirstName").val();
+			d.middleName = $("#MiddleName").val();
+			d.lastName = $("#LastName").val();
+			}
+			},
+			"columns": [
+			{ "data": "id", title: "Action", orderable: true},
+			{ "data": "firstName", title: "First Name", orderable: false },
+			{ "data": "middleName", title: "Middle Name", orderable: false },
+			{ "data": "lastName", title: "Last Name", orderable: false },
+			]
+			,
+			'select': {
+			'style': 'single'
+			},
+			"order": [[0, "desc"]]
+
+
+
+			});
+
+		function EmployeeSearchAjax(empid) {
+		var l = $('#EmployeeSearchByName').ladda();
+		l.ladda('start');
+		$.ajax({
+		type: "POST",
+		url: "@Url.Content("~/employees/checkEmployee")?employeeId=" + $.trim(empid) +"&d=@ViewBag.dGet",
+		//"contentType": "application/json; charset=utf-8",
+		dataType: "JSON",
+		success: function (data, textStatus, jqXHR) {
+		if (data.error != 1) {
+
+		$("#PassengerTypeId").val("1").change();
+		$("#EmployeeNo").val(empid);
+		$("#FirstName").val(data['data'].firstName);
+		$("#MiddleName").val(data['data'].middleName);
+		$("#LastName").val(data['data'].lastName);
+		$("#Position").val(data['data'].position);
+			$("#CompanyListId").val(data['data'].companyListId).change();
+		//commented 02-13-2020
+		//$("#ChargingCompanyId").val(data['data'].chargingCompanyId).change();
+		//$("#ChargingDepartmentId").append("<option value='" + data.chargingDepartmentId + "'>" + data.chargingDepartment + "</option>").val(data.chargingDepartmentId).change();
+		//end commented 02-13-2020
+		//$("#ChargingCompanyId").val(data['data'].chargingCompanyId).change();
+		//$("#ChargingDepartmentId").append("<option value='" + data.chargingDepartmentId + "'>" + data.chargingDepartment + "</option>").val(data.chargingDepartmentId).change();
+
+			//default charging company and department of the requestor applied 02-13-2020
+
+						$("#ChargingCompanyId").val('@ViewBag.defaultChargingCompanyId').change();
+						$("#ChargingDepartmentId").append("<option value='@ViewBag.defaultChargingDepartmentId'>@ViewBag.defaultChargingDepartmentName</option>").val('@ViewBag.defaultChargingDepartmentId').change();
+
+		//end
+
+		CheckCompanyList();
+		DisableLookupElement();
+
+		} else {
+		$("#Name").val("");
+		$("#Position").val("");
+		$("#CompanyListId").val("").change();;
+		swalAlertOnly("Error", data["message"], "error");
+		}
+
+		l.ladda('stop');
+
+		$("#ModalEmployeeFilter").modal("hide");
+		}
+		});
+
+		}
+
+
+		function RemoveEmployeeAjax(id) {
+
+		swal({
+		title: "Are you sure?",
+		text: "This will remove the reservation for this person!",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: "Yes, remove it!",
+		closeOnConfirm: false
+		}, function () {
+
+
+			$("#ModalLoading").modal("show");
+			$("#ModalLoading").css('display', 'block');
+		$.ajax({
+		type: "POST",
+		url: "@Url.Content("~/driverpassengers/removeReservation")/"+id+"?Id=" + id,
+		//"contentType": "application/json; charset=utf-8",
+		dataType: "JSON",
+		success: function (data, textStatus, jqXHR) {
+
+			$("#ModalLoading").css('display', 'none');
+		if (data.success == 1) {
+		$('#data_table_rec1').DataTable().clear().draw();
+		$('#data_table_rec1').DataTable().ajax.reload();
+		swal("Removed!", "Reservation has been removed.", "success");
+		} else {
+		swalAlertOnly("Error", data.message, "error");
+		}
+
+		}
+		});
+
+		});
+
+		}
+
+
+		function Submit() {
+
+			swal({
+				title: "Are you sure?",
+				text: "You cannot add more passenger once submitted!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Submit!",
+				closeOnConfirm: false
+			}, 
+			function () {
+				var checkifapprover = "@ViewBag.OverAllApprover";
+				var _url = "";
+				if (checkifapprover == "1") {
+					_url = "@Url.Content("~/driverpassengers/approveBypass")/@ViewBag.dget?timestamp=@ViewBag.dget&tid=@ViewBag.tget";
+				}
+				else {
+					_url = "@Url.Content("~/driverpassengers/submitReservation")/@ViewBag.dget?timestamp=@ViewBag.dget&tid=@ViewBag.tget";
+				}
+
+				$("#ModalLoadingSMS").modal("show");
+				$("#ModalLoadingSMS").css('display', 'block');
+				$.ajax({
+					type: "POST",
+					url: _url,
+					//"contentType": "application/json; charset=utf-8",
+					dataType: "JSON",
+					success: function (data, textStatus, jqXHR) {
+
+						$("#ModalLoadingSMS").css('display', 'none');
+						if (data.success == 1) {
+							$('#data_table_rec1').DataTable().clear().draw();
+							$('#data_table_rec1').DataTable().ajax.reload();
+
+						window.removeEventListener("beforeunload", functionToRun);
+
+
+									//reload the page
+											swal({
+															title: "Success",
+															text: "Reservation has been submitted." + data.otherReservation,
+															type: "success"
+														},
+												function () {
+													var checkifFromTrip = "@ViewBag.FromTrip";
+													if (checkifFromTrip != "") {
+														window.location.href = "@Url.Content("~/trips/AssignTrip")" + "?d=@ViewBag.dget&t=@ViewBag.tget&tempid=@ViewBag.tempid";
+													}
+													else {
+														window.location.href = "@Url.Content("~/driverpassengers/details")" + "?d=@ViewBag.dget";
+													}
+
+											});
+										//end reload the page
+
+							$("#btnAddToList").addClass("hidden");
+							$("#btnSubmit").addClass("hidden");
+							$(".ChargingGroup").addClass("hidden");
+							$(".PassengerGroup").addClass("hidden");
+
+						} else {
+
+							swalAlertOnly("Error", data.message, "error");
+						}
+					}
+				});
+
+			});
+
+		}
+
+
+		function ValidatePassengerType() {
+
+			$("#CompanyListId").val("");
+			$("#CompanyOther").val("");
+			$("#Nationality").val("Filipino").trigger("change");
+			$("#Gender").val("Male").trigger("change");
+
+		if ($("#PassengerTypeId").val() == 2) {
+
+			$("#EmployeeNo").closest("div").find(".field-validation-error").empty();
+			$("#EmployeeNo").removeClass("input-validation-error");
+
+			//$('#CompanyOther').validate();
+			$("#EmployeeNo").val("");
+			$("#EmployeeNo").attr('disabled', 'disabled');
+			$("#EmployeeNo").rules("remove");
+
+			$(".ContactNoGroup").removeClass('hidden');
+			$("#divForCompanyID").addClass('hidden');
+			$("#CompanyOther").removeAttr( 'disabled');
+			$("#CompanyOther").rules("add", {
+				required: true
+			});
+			$('.clear-search').hide();
+		}
+		else {
+			$("#ChargingCompanyId").val('').change();
+			$("#ChargingDepartmentId").val('').change();
+			$(".ContactNoGroup").removeClass('hidden');
+			$(".ContactNoGroup").addClass('hidden');
+			$("#CompanyOther").closest("div").find(".field-validation-error").empty();
+			$("#CompanyOther").removeClass("input-validation-error");
+
+			$("#divForCompanyID").removeClass('hidden');
+			$("#CompanyOther").attr('disabled', 'disabled');
+			$("#CompanyOther").rules("remove");
+
+			$("#EmployeeNo").removeAttr('disabled');
+			$("#EmployeeNo").rules("add", {
+				required: true
+			});
+			$('.clear-search').show();
+		}
+
+			//default charging
+			$("#ChargingCompanyId").val('@ViewBag.defaultChargingCompanyId').change();
+			$("#ChargingDepartmentId").append("<option value='@ViewBag.defaultChargingDepartmentId'>@ViewBag.defaultChargingDepartmentName</option>").val('@ViewBag.defaultChargingDepartmentId').change();
+			//end
+
+			var checkifapprover = "@ViewBag.OverAllApprover";
+			if (checkifapprover != "1") {
+				$("#ChargingCompanyId").attr("disabled", true);
+				$("#ChargingDepartmentId").attr("disabled", true);
+			}
+
+
+		}
+
+		function CheckCompanyList() {
+
+			$("#CompanyOther").val("");
+
+			if ($("#CompanyListId").val() == 1) {
+				$("#CompanyOther").removeAttr('disabled');
+				$("#CompanyOther").rules("add", {
+					required: true
+				});
+			}
+			else {
+				$("#CompanyOther").closest("div").find(".field-validation-error").empty();
+				$("#CompanyOther").removeClass("input-validation-error");
+				$("#CompanyOther").attr('disabled', 'disabled');
+				$("#CompanyOther").rules("remove");
+				}
+		}
+
+		function DisableLookupElement() {
+			$(".lookupElement:input").attr("disabled",true);
+		}
+
+		function EnableLookupElement() {
+			$(".lookupElement:input").removeAttr("disabled");
+
+			$(".select2").select2({ placeholder: "Please Select" });
+		}
+		function resetLookupElement() {
+			$(".lookupElement:input").removeAttr("readonly");
+			$(".lookupElement:input").val("");
+			EnableLookupElement();
+			$("#PassengerTypeId").val("1");
+
+		}
+
+		function checkChargingDepartment() {
+
+
+		$("#ChargingDepartmentId").select2({
+		ajax: {
+			type: "POST",
+			url: "@Url.Content("~/employees/getChargingDepartmentList?companyId=")" + $("#ChargingCompanyId").val(),
+			dataType: 'json',
+			delay: 250,
+			data: function (params) {
+				return {
+				q: params.term, // search term
+				page: params.page
+			};
+		},
+		processResults: function (data, page) {
+		// parse the results into the format expected by Select2.
+			// since we are using custom formatting functions we do not need to
+			// alter the remote JSON data
+			return {
+				results: data.items
+			};
+		},
+		cache: false
+		},
+			minimumInputLength: 1,
+			width: '100%'
+			});
+
+			$("#ChargingDepartmentId").val("").trigger('change');
+		}
+
+	$(document).ready(function () {
+		ValidatePassengerType();
+		CheckCompanyList();
+		$(".select2").select2({ placeholder: "Please Select" });
+
+		// Handle toggle switch (With / Without passengers)
+		// when checkbox changes
+		$("#ServiceTypeId").on("change", function () {
+			let selectedText = $("#ServiceTypeId option:selected").text();
+
+			if (selectedText === "No Passenger") {
+
+				$("#PassengerTypeId").val("2").trigger("change").prop("disabled", true);
+				$("#CompanyOther").val("NO PASSENGER").prop("readonly", true);
+				$("#FirstName").val("NO PASSENGER").prop("readonly", true);
+				$("#MiddleName").val("NO PASSENGER").prop("readonly", true);
+				$("#LastName").val("NO PASSENGER").prop("readonly", true);
+				$("#Position").val("NO PASSENGER").prop("readonly", true);
+				$("#ContactNo").val("").prop("readonly", true);
+
+				$("#Nationality").val("Filipino").trigger("change").prop("disabled", true);
+				$("#Gender").val("Male").trigger("change").prop("disabled", true);
+
+				ensureHidden("PassengerTypeIdHidden", "PassengerTypeId", "2");
+				ensureHidden("NationalityHidden", "Nationality", "Filipino");
+				ensureHidden("GenderHidden", "Gender", "Male");
+
+				$('.clear-search').hide();
+				// Show note
+				$("#noPassengerNote").fadeIn();
+			}
+			else {
+				$("#PassengerTypeId").val("").trigger("change").prop("disabled", false);
+				$("#CompanyOther, #FirstName, #MiddleName, #LastName, #ContactNo, #Position")
+					.val("").prop("readonly", false);
+
+				$("#Nationality").val("").trigger("change").prop("disabled", false);
+				$("#Gender").val("").trigger("change").prop("disabled", false);
+
+				$('.clear-search').show();
+				// Hide note
+				$("#noPassengerNote").fadeOut();
+			}
+		});
+
+		// Helper function to add/update hidden inputs
+		function ensureHidden(hiddenId, name, value) {
+			if ($("#" + hiddenId).length === 0) {
+				$("<input>").attr({
+					type: "hidden",
+					id: hiddenId,
+					name: name,
+					value: value
+				}).appendTo("form");
+			} else {
+				$("#" + hiddenId).val(value);
+			}
+		}
+
+		// Run once on page load
+		$("#togglePassengers").trigger("change");
+	});
+
+</script>
+<script>
+
+	function checkOrigin() {
+		if ($("#OriginId").text() == "Makati HO") {
+			$("#Origin").val("Makati HO");
+			$("#Origin").attr("readonly", "readonly");
+		}
+		else if ($("#OriginId").val() == "CPC") {
+			$("#Origin").val("CPC");
+			$("#Origin").attr("readonly", "readonly");
+		}
+		else {
+			$("#Origin").val("");
+			$("#Origin").removeAttr("readonly");
+		}
+	}
+	function checkDestination() {
+		if ($("#DestinationId").val() == "Makati HO") {
+			$("#Destination").val("Makati HO");
+			$("#Destination").attr("readonly", "readonly");
+		}
+		else if ($("#DestinationId").val() == "CPC") {
+			$("#Destination").val("CPC");
+			$("#Destination").attr("readonly", "readonly");
+		}
+		else {
+			$("#Destination").val("");
+			$("#Destination").removeAttr("readonly");
+		}
+	}
+
+</script>
+
+
+@if (_dhead != null)
+{
+	if (_dhead.Id > 0)
+	{
+		<script>
+			$("#TripTimeFrom").val("@_dhead.TripTimeFrom");
+			$("#TripTimeTo").val("@_dhead.TripTimeTo");
+			$("#Instructions").val(`@_dhead.Instructions`);
+			$("#Purpose").val(`@_dhead.Purpose`);
+			$("#ServiceTypeId").val(`@_dhead.ServiceTypeId`).change();
+			$("#OriginId").val(`@_dhead.OriginId`);
+			$("#DestinationId").val(`@_dhead.DestinationId`);
+				$("#UnplannedTrip").val(`@_dhead.UnplannedTrip`).change();
+			checkDestination();
+			checkOrigin();
+			$("#Origin").val(`@_dhead.Origin`);
+			$("#Destination").val(`@_dhead.Destination`);
+
+		</script>
+
+
+		if (_dhead.EmployeeId != ViewBag.EmployeeId && ViewBag.OverAllApprover != 1)
+		{
+			<script>
+				$("#btnAddToList").addClass("hidden");
+				$("#btnSubmit").addClass("hidden");
+				$("#ShuttleForm").addClass("hidden");
+
+			</script>
+		}
+		else if ((_dhead.ShuttleId > 0 || _dhead.Status == 5 || _dhead.Status == 1) && ViewBag.OverAllApprover != 1)
+		{
+
+			<script>
+				$("#btnAddToList").addClass("hidden");
+				$("#btnSubmit").addClass("hidden");
+				$(".ChargingGroup").addClass("hidden");
+				$(".PassengerGroup").addClass("hidden");
+
+			</script>
+		}
+		else
+		{
+			<script>
+				window.addEventListener("beforeunload", functionToRun);
+			</script>
+		}
+
+	}
+}
+

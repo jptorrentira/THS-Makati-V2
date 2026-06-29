@@ -1,0 +1,543 @@
+﻿@model ShuttleService.Models.Employee
+
+@{
+    ViewData["Title"] = "Profile";
+}
+<style>
+    .select2-container {
+        z-index: 99999 !important;
+        width: 100%!important;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div class="wrapper-content row">
+            <div class="col-md-10 pull-left">
+                <h4>Manage Profile</h4>
+            </div>
+        </div>
+
+        <div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+            <form asp-action="Profile" id="PageForm" class="form-horizontal">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 style="color:#1ab394">Employee Information</h3>
+                        <hr />
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="EmployeeNo" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="EmployeeNo" class="form-control" disabled />
+                                <span asp-validation-for="EmployeeNo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="FirstName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MiddleName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="MiddleName" class="form-control" />
+                                <span asp-validation-for="MiddleName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LastName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Position" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="Position" class="form-control" />
+                                <span asp-validation-for="Position" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyGroupId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="CompanyGroupId" class="form-control select2simple" onchange="checkCompanyList();checkChargingCompanyList();" asp-items="ViewBag.CompanyGroupId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyListId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="CompanyListId" class="form-control select2simple" onchange="checkDepartment();" asp-items="ViewBag.CompanyListId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="DepartmentListId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="DepartmentListId" class="form-control select2simple" asp-items="ViewBag.DepartmentListId">
+                                    <option default></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ChargingCompanyId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="ChargingCompanyId" class="form-control select2simple" onchange="checkChargingDepartment();" asp-items="ViewBag.ChargingCompanyId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ChargingDepartmentId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="ChargingDepartmentId" class="form-control select2simple" asp-items="ViewBag.ChargingDepartmentId">
+                                    <option default></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" id="locationField" style="display: none;">
+                            <label asp-for="LocationIds" class="control-label col-md-3">Location/s</label>
+                            <div class="col-md-8">
+                                <select asp-for="LocationIds" class="form-control select2simple" multiple asp-items="ViewBag.LocationListId">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Gender" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="Gender" class="form-control">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="NationalityId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="NationalityId" class="form-control" asp-items="ViewBag.NationalityId"></select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label asp-for="SupervisorEmployeeNo" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+
+                                <select asp-for="SupervisorEmployeeNo" class="form-control" asp-items="ViewBag.SupervisorEmployeeNo" disabled></select>
+                                @*<input asp-for="SupervisorEmployeeNo" class="form-control" />*@
+                                <span asp-validation-for="SupervisorEmployeeNo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+
+                                <div class="checkbox checkbox-info">
+                                    <input id="IsImmediateHead" name="IsImmediateHead" value="false" type="checkbox" class="ebeBoolean" disabled />
+
+                                    <label for="IsImmediateHead"> Please check here to identify that he/she is an immediate head</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label asp-for="Status" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="Status" class="form-control" />
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+
+
+                            <div class="row hidden">
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHead" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHead" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHead" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHeadValidFrom" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHeadValidFrom" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHeadValidFrom" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHeadValidTo" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHeadValidTo" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHeadValidTo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input asp-for="AlternateImmediateHeadValidity" /> @Html.DisplayNameFor(model => model.AlternateImmediateHeadValidity)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="EncodedBy" class="control-label"></label>
+                                    <input asp-for="EncodedBy" class="form-control" />
+                                    <span asp-validation-for="EncodedBy" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="LastModifiedBy" class="control-label"></label>
+                                    <input asp-for="LastModifiedBy" class="form-control" />
+                                    <span asp-validation-for="LastModifiedBy" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="EncodeDate" class="control-label"></label>
+                                    <input asp-for="EncodeDate" class="form-control" />
+                                    <span asp-validation-for="EncodeDate" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="ModifyDate" class="control-label"></label>
+                                    <input asp-for="ModifyDate" class="form-control" />
+                                    <span asp-validation-for="ModifyDate" class="text-danger"></span>
+                                </div>
+                                @*<div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>*@
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 style="color:#1ab394">Contact Information</h3>
+                        <hr />
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="MobileNumber" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="MobileNumber" class="form-control" />
+                                <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LocalNumber" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="LocalNumber" class="form-control" />
+                                <span asp-validation-for="LocalNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyEmail" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="CompanyEmail" class="form-control" />
+                                <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="AlternativeEmail" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="AlternativeEmail" class="form-control" />
+                                <span asp-validation-for="AlternativeEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <hr />
+
+                <div class="form-group">
+                    <label class="control-label col-md-3"></label>
+                    <div class="col-md-8">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" id="btnSave" class="ladda-button btn btn-primary" data-style="expand-left">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Initial check
+        checkCompanyGroup();
+
+        // Trigger check when CompanyGroupId changes
+        $("#CompanyGroupId").on("change", function() {
+            checkCompanyGroup();
+        });
+
+    });
+
+    $(".select2simple").select2();
+    var atl = $('#btnSave').ladda();
+    atl.click(function () {
+
+        if ($("#btnSave").is('[disabled]') == false) {
+
+
+            if ($.trim($("#MobileNumber").val()) != "" && $.trim($("#LocalNumber").val()) != "" && $.trim($("#CompanyEmail").val()) != "" && $.trim($("#AlternativeEmail").val()) != "") {
+                swal({
+                    title: "Are you sure?",
+                    text: "This will save your contact information",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Save it!",
+                    closeOnConfirm: false,
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        if ($.trim($("#MobileNumber").val()) != "" && $.trim($("#LocalNumber").val()) != "" && $.trim($("#CompanyEmail").val()) != "" && $.trim($("#AlternativeEmail").val()) != "") {
+
+                            $("#ModalLoading").modal("show");
+                            $("#ModalLoading").css('display', 'block');
+                            if ($("#IsImmediateHead").is(':checked')) {
+                                $("#IsImmediateHead").attr('value', 'true');
+                            } else {
+                                $("#IsImmediateHead").attr('value', 'false');
+                            }
+
+                            // Start loading
+                            atl.ladda('start');
+                            $("#backtolist").attr('disabled', 'disabled');
+
+                            var urlPost = "";
+                            if ("@ViewBag.neworupdate" == "Edit") {
+                                urlPost = "@Url.Content("~/employees/profile")/" + $("#Id").val();
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: urlPost,
+                                data: $("#PageForm").serialize(),
+                                //"contentType": "application/json; charset=utf-8",
+                                dataType: "JSON",
+                                success: function (data, textStatus, jqXHR) {
+                                    $("#ModalLoading").modal("hide");
+                                    if (data.success == 1) {
+
+                                        swal({
+                                            title: "Success",
+                                            text: "Success!",
+                                            type: "success"
+                                        },
+                                            function () {
+                                                location.reload();
+                                                //window.location.href = "@Url.Content("~/employees/index")";
+                                            });
+
+                                    } else {
+                                        swal({
+                                            title: "Error",
+                                            text: data.message,
+                                            type: "error"
+                                        });
+
+
+                                    }
+
+                                    $("#backtolist").removeAttr('disabled');
+                                    atl.ladda('stop');
+                                    $("#ModalLoading").css('display', 'none');
+                                }
+                            });
+
+
+                        }
+                    }
+
+                });
+            
+            }
+            else {
+                swal({
+                    title: "Error",
+                    text: "Please complete your contact information",
+                    type: "error"
+                });
+            }
+
+            var companyGroup = $("#CompanyGroupId option:selected").text();
+            if (companyGroup === "UPDI") {
+                var selectedLocations = $("#LocationIds").val(); // array of selected values
+                
+                if (!selectedLocations || selectedLocations.length === 0) {
+                    swal({
+                        title: "Error",
+                        text: "Please select at least one location for UPDI company group.",
+                        type: "error"
+                    });
+                    return; // stop submission
+                }
+            }
+        }
+
+    });
+
+
+    function checkCompanyList() {
+        $("#CompanyListId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getCompanyList?companyGroupId=")" + $("#CompanyGroupId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#CompanyListId").val("").trigger('change');
+        checkCompanyGroup();
+    }
+    function checkChargingCompanyList() {
+        $("#ChargingCompanyId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getChargingCompanyList?companyGroupId=")" + $("#CompanyGroupId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#ChargingCompanyId").val("").trigger('change');
+    }
+    function checkDepartment() {
+        $("#DepartmentListId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getDepartmentList?companyId=")" + $("#CompanyListId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#DepartmentListId").val("").trigger('change');
+    }
+    function checkChargingDepartment() {
+        $("#ChargingDepartmentId").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getChargingDepartmentList?companyId=")" + $("#ChargingCompanyId").val(),
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+        $("#ChargingDepartmentId").val("").trigger('change');
+    }
+    function checkCompanyGroup() {
+        var group = $("#CompanyGroupId option:selected").text();
+        if (group === "UPDI") {
+            $("#locationField").show();
+        } else {
+            $("#locationField").hide();
+            $("#LocationIds").val(null).trigger("change"); // clear selection
+        }
+    }
+
+    function checkselect2destroy() {
+        $("#CompanyListId").rules("add", {
+            required: true
+        });
+        $("#DepartmentListId").rules("add", {
+            required: true
+        });
+        $("#ChargingCompanyId").rules("add", {
+            required: true
+        });
+        $("#ChargingDepartmentId").rules("add", {
+            required: true
+        });
+
+
+
+        if ($("#CompanyListId").val() != "") {
+            $("#CompanyListId").select2('destroy');
+        }
+
+        if ($("#DepartmentListId").val() != "") {
+            $("#DepartmentListId").select2('destroy');
+        }
+
+        if ($("#ChargingCompanyId").val() != "") {
+            $("#ChargingCompanyId").select2('destroy');
+        }
+
+        if ($("#ChargingDepartmentId").val() != "") {
+            $("#ChargingDepartmentId").select2('destroy');
+        }
+    }
+
+</script>

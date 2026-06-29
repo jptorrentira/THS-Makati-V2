@@ -1,0 +1,304 @@
+﻿
+
+@{
+
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+    var _location = @HttpContextAccessor.HttpContext.Session.GetString("Session_location");
+
+    ViewData["Title"] = "Trips Calendar";
+
+    var companyGroup = ViewBag.CompanyGroup;
+}
+
+
+
+<div class="wrapper wrapper-content animated">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Trips Calendar </h5>
+                </div>
+                <div class="ibox-content">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade elwyn_modal-center" id="Guideline" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: white; padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                    <center>
+                        <h4 class="modal-title" id="ModalTitle" style="color: black!important;font-size: 15px;">MAKATI-CALACA Shuttle Reservation Guidelines</h4>
+                    </center>
+
+                </div>
+                <div class="modal-body">
+
+                    <iframe src="https://repo.aunasin.com/assets/tths/guideline/Calaca shuttle guidlines.pdf" style="width:100%;" height="800" name="foo"></iframe>
+                    <center>
+                        <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">I Understand</button>
+                    </center>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="createTrip" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content modal-col-red">
+                <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                    <h4 class="modal-title" id="ModalTitle" style="font-size: 15px;">Create Trip</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="loaded">
+                        <button type="button" class="btn btn-danger waves-effect">Save</button>
+                        <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="chooseTripType" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content modal-col-red">
+                <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                    <h4 class="modal-title" id="ModalTitle" style="font-size: 15px;">Please chooose trip type</h4>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <div class="btn-group">
+                            <input type="hidden" id="dTimeStamp" value="" />
+                            @if (companyGroup != "UPDI" && companyGroup != "MINESITE")
+                            {
+                               <button type="button" class="btn btn-primary waves-effect" onclick="goShuttle();">Calaca Shuttle Service </button> 
+                            }                            
+
+                            <button type="button" class="btn btn-success waves-effect" onclick="goDriver();">Driver Vehicle</button>
+                        </div>
+                    </center>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+
+    $(document).ready(function () {
+
+
+
+        /* initialize the calendar
+      -----------------------------------------------------------------*/
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+        var eventArray = [];
+
+
+
+        //eventArray.push('Long Event 2');
+        //eventDateArray.push('2019-10-17');
+
+
+
+
+        var calendarView = $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                //right: 'month'
+            },
+            displayEventTime: false,
+            dayClick: function (date, jsEvent, view) {
+                var dateToday = new Date();
+
+
+                //origiranal code 12-17-2019
+                //$("#loading").modal('show');
+                var unixTime = date / 1000;
+                $("#dTimeStamp").val(unixTime);
+
+                if ('@_location' == "calaca") {
+                    goDriver();
+                }
+                else {
+                    chechifhastrip(unixTime);
+                }
+
+
+
+                //window.location.href = "trips/details?d=" + (date / 1000);
+                //end original code
+
+
+
+
+            },
+            editable: false,
+            droppable: false, // this allows things to be dropped onto the calendar
+            drop: function () {
+            },
+            eventLimit: 10, // for all non-TimeGrid views
+            views: {
+                timeGrid: {
+                    eventLimit: 10 // adjust to 6 only for timeGridWeek/timeGridDay
+                }
+            },
+            events: []
+        });
+
+        eventArray = [
+            { title: 'New event', start: new Date() },
+            { title: 'New event', start: new Date() }
+        ];
+
+        //$('#calendar').fullCalendar('renderEvent', eventArray, true);
+
+        //$('#calendar').fullCalendar('addEventSource', eventArray);
+
+        $('.fc-prev-button').click(function () {
+            LoadCalendar(1);
+        });
+
+        $('.fc-next-button').click(function () {
+            LoadCalendar(1);
+        });
+
+
+
+        LoadCalendar(2);
+
+    });
+
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+
+
+
+
+
+    </script>
+
+}
+
+<script>
+
+
+
+
+    function LoadCalendar(e) {
+        var urlString = "";
+        if (e == 1) {
+            urlString = "@Url.Content("~/trips/ReloadCalendar")" + "?dateFilter=" + $('#calendar').fullCalendar('getDate').format() + "&method=shuttle&e=2";
+        } else {
+            var date = new Date();
+            var d = date.getDate();
+            var m = date.getMonth();
+            var y = date.getFullYear();
+
+            urlString = "@Url.Content("~/trips/ReloadCalendar")" + "?dateFilter=" + y + '-' + ("0" + (m + 1)).slice(-2) + '-' + ("0" + d).slice(-2) + "&method=shuttle&e=1";
+        }
+        //alert();
+
+        $.ajax({
+            type: "POST",
+            url: urlString,
+            //"contentType": "application/json; charset=utf-8",
+            dataType: "JSON",
+            success: function (data, textStatus, jqXHR) {
+                if (data.status == "OK") {
+                    $('#calendar').fullCalendar('removeEvents');
+                    var events = [];
+                    $.each(data.events, function (index, value) {
+                        //console.log(value);
+                        events.push({
+                            title: value[0]['title'],
+                            start: value[0]['start'],
+                            //all data
+                        });
+                        //console.log(value)
+                    });
+                    $('#calendar').fullCalendar('addEventSource', events);
+                }
+                else {
+                    //alert(data.message);
+                }
+            }
+        });
+    }
+
+    function goShuttle() {
+        window.location.href = "trips/details?d=" + $("#dTimeStamp").val();
+    }
+
+    function goDriver() {
+        window.location.href = "trips/detailsDriver?d=" + $("#dTimeStamp").val();
+    }
+
+    function chechifhastrip(d) {
+        $("#chooseTripType").modal("show");
+        //window.location.href = "trips/details?d=" + d;
+
+
+
+
+        /*
+        var urlString = "/trips/checkifhastrip?dateFilter=" + d;
+        $.ajax({
+            type: "POST",
+            url: urlString,
+            //"contentType": "application/json; charset=utf-8",
+            dataType: "JSON",
+            success: function (data, textStatus, jqXHR) {
+                $("#loading").modal('hide');
+                if (data.tripCount == 0) {
+                    swal({
+                        title: "No Trip Found!",
+                        text: "Do you want to create a trip for this date?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, do it!",
+                        closeOnConfirm: true
+                    }, function () {
+
+                        $("#createTrip").modal('show');
+
+                    });
+                }
+                else {
+                    window.location.href = "trips/details?d=" + d;
+                }
+            }
+        });
+        */
+    }
+
+
+</script>

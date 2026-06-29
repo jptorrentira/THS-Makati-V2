@@ -1,0 +1,81 @@
+﻿
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" href="~/THLogos/icon.png" />
+    <title>THS | Login</title>
+
+    <link href="~/css_free/bootstrap.min.css" rel="stylesheet">
+    <link href="~/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <link href="~/css_free/animate.css" rel="stylesheet">
+    <link href="~/css_free/style.css" rel="stylesheet">
+    <!-- Mainly scripts -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/jquery-3.7.1.js.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/bootstrap.min.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/inspinia.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/pace/pace.min.js"></script>
+
+    <!-- Steps -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/staps/jquery.steps.min.js"></script>
+
+    <!-- Jquery Validate -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/validate/jquery.validate.min.js"></script>
+
+    @*for sweetalert*@
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/sweetalert/sweetalert.min.js"></script>
+    @*end for sweetalert*@
+    <!-- Input Mask-->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/jasny/jasny-bootstrap.min.js"></script>
+</head>
+
+<body class="gray-bg">
+    <div class="loginColumns animated fadeInDown windows">
+        <div class="row">
+
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                @*<center>  <h1 class=" font-bold text-center" style="color: #1ab394"><span class="fa fa-cab"></span>Transportation Hub System</h1> </center>*@
+                @*<h2 class="font-bold ">Shuttle Service Reservation System</h2>*@
+                <img src="https://repo.aunasin.com/assets/tths/THLogos/Transpo Hub.png" width="100%" />
+                <div class="ibox-content">
+                    <center>
+                        <h2>Please click the link below to access the transport hub system:</h2>
+                      @*<a href="https://www.semirarampc.com:8443/transporthub">https://www.semirarampc.com:8443/transporthub</a>*@
+                        <a href="https://ictsystems.semirarampc.com:8443/TransportHub/">https://ictsystems.semirarampc.com:8443/TransportHub/</a>
+                    </center>
+
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                SMPC - ICT
+                <b>
+                    Transportation Hub System
+                </b>
+                <small class="pull-right">&copy; 2020 - @DateTime.Now.Year</small>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+﻿@model ShuttleService.Models.ShuttlePassenger
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>ShuttlePassenger</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="ShuttleId" class="control-label"></label>
+                <select asp-for="ShuttleId" class="form-control" asp-items="ViewBag.ShuttleId"></select>
+                <span asp-validation-for="ShuttleId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PassengerTypeId" class="control-label"></label>
+                <select asp-for="PassengerTypeId" class="form-control" asp-items="ViewBag.PassengerTypeId"></select>
+                <span asp-validation-for="PassengerTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeeNo" class="control-label"></label>
+                <input asp-for="EmployeeNo" class="form-control" />
+                <span asp-validation-for="EmployeeNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyListId" class="control-label"></label>
+                <input asp-for="CompanyListId" class="form-control" />
+                <span asp-validation-for="CompanyListId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChargingCompanyId" class="control-label"></label>
+                <input asp-for="ChargingCompanyId" class="form-control" />
+                <span asp-validation-for="ChargingCompanyId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChargingDepartmentId" class="control-label"></label>
+                <input asp-for="ChargingDepartmentId" class="form-control" />
+                <span asp-validation-for="ChargingDepartmentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Position" class="control-label"></label>
+                <input asp-for="Position" class="form-control" />
+                <span asp-validation-for="Position" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Purpose" class="control-label"></label>
+                <input asp-for="Purpose" class="form-control" />
+                <span asp-validation-for="Purpose" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Remarks" class="control-label"></label>
+                <input asp-for="Remarks" class="form-control" />
+                <span asp-validation-for="Remarks" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TripTypeId" class="control-label"></label>
+                <select asp-for="TripTypeId" class="form-control" asp-items="ViewBag.TripTypeId"></select>
+                <span asp-validation-for="TripTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Breakfast" /> @Html.DisplayNameFor(model => model.Breakfast)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AmSnack" /> @Html.DisplayNameFor(model => model.AmSnack)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="PmSnack" /> @Html.DisplayNameFor(model => model.PmSnack)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Lunch" /> @Html.DisplayNameFor(model => model.Lunch)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Dinner" /> @Html.DisplayNameFor(model => model.Dinner)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

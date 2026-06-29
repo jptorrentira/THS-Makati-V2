@@ -1,0 +1,602 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" href="~/THLogos/icon.png" />
+    <title>SSRS | Register</title>
+
+    <link href="~/css_free/bootstrap.min.css" rel="stylesheet">
+    <link href="~/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <link href="~/css_free/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="~/css_free/animate.css" rel="stylesheet">
+    <link href="~/css_free/style.css" rel="stylesheet">
+    <link href="~/css_free/plugins/steps/jquery.steps.css" rel="stylesheet">
+    @*for sweetalert*@
+    <link href="~/css_free/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    @*end for sweetalert*@
+
+    @*for checkbox*@
+    <link href="~/css_free/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    @*end for checkbox*@
+    <!-- Mainly scripts -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/jquery-3.7.1.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/bootstrap.min.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/inspinia.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/pace/pace.min.js"></script>
+
+    <!-- Steps -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/staps/jquery.steps.min.js"></script>
+
+    <!-- Jquery Validate -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/validate/jquery.validate.min.js"></script>
+
+    @*for sweetalert*@
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/sweetalert/sweetalert.min.js"></script>
+    @*end for sweetalert*@
+    <!-- Input Mask-->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/jasny/jasny-bootstrap.min.js"></script>
+    @*for checkbox*@
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/iCheck/icheck.min.js"></script>
+    @*end for checkbox*@
+    <style>
+        .wizard-big.wizard > .content {
+            min-height: 400px !important;
+        }
+    </style>
+
+</head>
+
+<body class="gray-bg">
+    <div class="row">
+        <div class="col-lg-3"></div>
+        <div class="col-lg-6">
+            <h2 class="font-bold text-center">Transport Hub System</h2>
+            <div class="ibox">
+                <div class="ibox-content">
+                    <h2>
+                        Registration
+                    </h2>
+                    <p>
+                        Please complete all the details below.
+                    </p>
+
+                    <form id="form" action="#" class="wizard-big">
+                        <h1>Account</h1>
+                        <fieldset style="overflow: auto;height: 100%; max-height: 100%; ">
+                            <div class="row">
+                                <div class="col-lg-2"></div>
+                                <div class="col-lg-8">
+                                    <div class="form-group">
+                                        <label>Employee No *</label>
+                                        <input id="employeeno" name="EmployeeId" type="text" class="form-control required">
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="checkbox checkbox-primary">
+                                            <input id="checkWindows" onchange="checkMethod();" type="checkbox">
+                                            <label for="checkWindows" onClick="checkMethod();">
+                                                Log-in Using Windows Account
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group hidden windowGroup" id="domainGroup">
+                                        <label>Domain *</label>
+                                        <select id="domain" name="Domain" type="text" class="form-control required">
+                                            <option value="smcdacon">smcdacon</option>
+                                            <option value="semcalaca">semcalaca</option>
+                                            <option value="semiraramining">semiraramining</option>
+                                        </select>
+                                        @*<input id="domain" name="Domain" type="text" class="form-control required">*@
+                                    </div>
+                                    <div class="form-group hidden windowGroup">
+                                        <label>Username *</label>
+                                        <input id="userName" name="UserName" type="text" class="form-control required">
+                                    </div>
+
+                                    <div class="form-group" id="PasswordGroup">
+                                        <label>Password *</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" name="password" style="text-align: left" placeholder="Password" id="password" autocomplete="off" required />
+                                            <span class="input-group-addon btn btn-default" style="background-color: white" onClick="ShowPassword('password')"><i class="fa fa-eye-slash " style="color:gray;" id="icon_password"></i></span>
+                                        </div>
+                                        @*<input id="confirmpassword" name="confirmpassword" type="password" class="form-control required">*@
+                                    </div>
+                                    <div class="form-group localGroup" id="confirmPasswordGroup">
+                                        <label>Confirm Password *</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" name="confirmpassword" style="text-align: left" placeholder="Confirm Password" id="confirmpassword" autocomplete="off" required />
+                                            <span class="input-group-addon btn btn-default" style="background-color: white" onClick="ShowPassword('confirmpassword')"><i class="fa fa-eye-slash " style="color:gray;" id="icon_confirmpassword"></i></span>
+                                        </div>
+                                        @*<input id="confirmpassword" name="confirmpassword" type="password" class="form-control required">*@
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </fieldset>
+                        <h1>Profile</h1>
+                        <fieldset>
+                            <h2>Profile Information</h2>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Company Email *</label>
+                                        <input id="CompanyEmail" name="Email" type="text" autocomplete="off" class="form-control required email">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Alternate Email *</label>
+                                        <input id="AlternativeEmail" name="AlternateEmail" type="text" autocomplete="off" class="form-control required email">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Mobile Number *</label>
+                                        <input id="MobileNumber" name="PhoneNumber" data-mask="09999999999" placeholder="ex. 09999999999" autocomplete="off" type="text" class="form-control required">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Local Number *</label>
+                                        <input id="LocalNumber" name="LocalNumber" data-mask="9999" placeholder="ex. 9999" type="text" autocomplete="off" class="form-control required">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+                        <h1>Finish</h1>
+                        <fieldset>
+                            <p>
+                                <center>
+                                    <h2>Terms and Conditions</h2>
+                                    <h1>
+                                        <b>Consent Form</b>
+                                    </h1>
+                                    <br />
+                                    <br />
+
+                                </center>
+                            </p>
+                            <p style="text-align: justify!important">
+                                In compliance with the requirements of Data Privacy Act of 2012, kindly signify your consent on the general use and sharing of information declared by or obtained from you in the course of your transaction/s with AGSD. These data may include your personal data or sensitive information, which may be collected, processed, stored or disclosed by AGSD for legitimate purposes and to implement the transaction which you requested.
+                                <br />
+                                <br />
+                                <center>
+                                    Thank you.
+                                </center>
+                            </p>
+
+                            <br />
+                            <input id="acceptTerms" name="acceptTerms" type="checkbox" class="required"> <label for="acceptTerms">I agree with the Terms and Conditions.</label>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="ModalLoading" tabindex="-1" role="dialog" style="z-index: 9999999 !important;" data-backdrop="false" data-keyboard="false">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content modal-col-red">
+                <div class="modal-body">
+                    <label>Processing...</label>
+                    <div class="progress progress-striped active">
+                        <div style="width: 79%" id="progressBar" class="progress-bar progress-bar-success">
+                            <span class="sr-only">79% Complete (success)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+
+    <script>
+            $(document).ready(function () {
+                $("#wizard").steps();
+                $("#form").steps({
+                    bodyTag: "fieldset",
+                    onStepChanging: function (event, currentIndex, newIndex) {
+                        // Always allow going backward even if the current step contains invalid fields!
+                        if (currentIndex > newIndex) {
+                            return true;
+                        }
+
+                        if (currentIndex === 0) {
+                            if ($('#checkWindows').is(':checked')) {
+
+                                $("#confirmpassword").attr('disabled', true);
+                                $("#domain").removeAttr('disabled');
+                                $("#userName").removeAttr('disabled');
+
+                                if ($.trim($("#domain").val()) == "" || $.trim($("#userName").val()) == "" || $.trim($("#password").val()) == "" || $.trim($("#employeeno").val()) == "") {
+                                    return $(this).valid();
+                                }
+                                else {
+                                    checkADResult();
+                                }
+                            } else {
+
+                                $("#confirmpassword").removeAttr('disabled');
+                                $("#domain").attr('disabled', true);
+                                $("#userName").attr('disabled', true);
+
+
+                                if ($.trim($("#password").val()) == "" || $.trim($("#employeeno").val()) == "" || $.trim($("#confirmpassword").val()) == "") {
+
+                                    return $(this).valid();
+                                }
+                                else if ($.trim($("#password").val()) != $.trim($("#confirmpassword").val())) {
+                                    swal({
+                                        title: "Unable to proceed",
+                                        text: "Password not match",
+                                        type: "error"
+                                    });
+                                    return false;
+                                }
+                                else {
+                                    checkLocalResult();
+                                }
+                            }
+
+
+
+
+
+                        }
+
+                        // Forbid suppressing "Warning" step if the user is to young
+                        if (newIndex === 3 && Number($("#age").val()) < 18) {
+                            return false;
+                        }
+
+                        var form = $(this);
+
+                        // Clean up if user went backward before
+                        if (currentIndex < newIndex) {
+                            // To remove error styles
+                            $(".body:eq(" + newIndex + ") label.error", form).remove();
+                            $(".body:eq(" + newIndex + ") .error", form).removeClass("error");
+                        }
+
+                        // Disable validation on fields that are disabled or hidden.
+                        form.validate().settings.ignore = ":disabled,:hidden";
+
+                        // Start validation; Prevent going forward if false
+                        return form.valid();
+                    },
+                    onStepChanged: function (event, currentIndex, priorIndex) {
+
+
+                        // Suppress (skip) "Warning" step if the user is old enough.
+                        if (currentIndex === 2 && Number($("#age").val()) >= 18) {
+                            $(this).steps("next");
+                        }
+
+                        // Suppress (skip) "Warning" step if the user is old enough and wants to the previous step.
+                        if (currentIndex === 2 && priorIndex === 3) {
+                            $(this).steps("previous");
+                        }
+                    },
+                    onFinishing: function (event, currentIndex) {
+
+                        var form = $(this);
+
+                        // Disable validation on fields that are disabled.
+                        // At this point it's recommended to do an overall check (mean ignoring only disabled fields)
+                        form.validate().settings.ignore = ":disabled";
+
+                        // Start validation; Prevent form submission if false
+                        return form.valid();
+                    },
+                    onFinished: function (event, currentIndex) {
+
+                        GoSaveUser();
+                        //var form = $(this);
+
+                        //// Submit form input
+                        //form.submit();
+
+
+
+                    },
+                    onCanceled: function (event) {
+                        window.location = "\login";
+                    }
+                }).validate({
+                    errorPlacement: function (error, element) {
+                        element.before(error);
+                    },
+                    rules: {
+                        confirm: {
+                            equalTo: "#password"
+                        }
+                    }
+                });
+            });
+
+
+
+            function checkADResult() {
+
+                $("#CompanyEmail").val("");
+                $("#AlternativeEmail").val("");
+                $("#MobileNumber").val("");
+                $("#LocalNumber").val("");
+                $("#ModalLoading").modal("show");
+                $("#ModalLoading").css('display', 'block');
+
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Content("~/accounts/checkAD")",
+                data: $("#form").serialize(),
+                //"contentType": "application/json; charset=utf-8",
+                dataType: "JSON",
+                success: function (data, textStatus, jqXHR) {
+
+                    $("#ModalLoading").modal("hide");
+                    $("#ModalLoading").css('display', 'none');
+                    if (data.result == "OK") {
+                        //$("#progressBar").css('width', "100%");
+                        var _valid = 1;
+                        if (data.empResult <= 0) {
+                            _valid = 0;
+                            $("#form").steps("previous");
+                            swal({
+                                title: "Unable to proceed",
+                                text: "Employee ID Not Found",
+                                type: "error"
+                            });
+                        }
+                        else if (data.userResult > 0) {
+                            _valid = 0;
+                            $("#form").steps("previous");
+                            swal({
+                                title: "Unable to proceed",
+                                text: "This Employee ID already have an account",
+                                type: "error"
+                            });
+                        }
+
+
+                        if (data.userADResult > 0) {
+                            _valid = 0;
+                            $("#form").steps("previous");
+                            swal({
+                                title: "Unable to proceed",
+                                text: "This Username already have an account",
+                                type: "error"
+                            });
+                        }
+
+                        if (_valid == 1) {
+                            $("#CompanyEmail").val(data.employeeData['companyEmail']);
+                            $("#AlternativeEmail").val(data.employeeData['alternativeEmail']);
+                            $("#MobileNumber").val(data.employeeData['mobileNumber']);
+                            $("#LocalNumber").val(data.employeeData['localNumber']);
+                        }
+                        else {
+                            $("#CompanyEmail").val("");
+                            $("#AlternativeEmail").val("");
+                            $("#MobileNumber").val("");
+                            $("#LocalNumber").val("");
+
+                        }
+
+
+
+                    } else {
+                        $("#form").steps("previous");
+
+                        //$("#progressBar").css('width', "100%");
+                        swal({
+                            title: "Unable to proceed",
+                            text: data.result,
+                            type: "error"
+                        });
+                    }
+
+
+
+                }
+            });
+
+        }
+
+
+            function checkLocalResult() {
+
+                $("#CompanyEmail").val("");
+                $("#AlternativeEmail").val("");
+                $("#MobileNumber").val("");
+                $("#LocalNumber").val("");
+                $("#ModalLoading").modal("show");
+                $("#ModalLoading").css('display', 'block');
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/accounts/checkLocal")",
+                    data: $("#form").serialize(),
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        $("#ModalLoading").css('display', 'none');
+                        $("#ModalLoading").modal("hide");
+                        if (data.result == "OK") {
+                            //$("#progressBar").css('width', "100%");
+                            var _valid = 1;
+                            if (data.empResult <= 0) {
+                                _valid = 0;
+                                $("#form").steps("previous");
+                                swal({
+                                    title: "Unable to proceed",
+                                    text: "Employee ID Not Found",
+                                    type: "error"
+                                });
+                            }
+                            else if (data.userResult > 0) {
+                                _valid = 0;
+                                $("#form").steps("previous");
+                                swal({
+                                    title: "Unable to proceed",
+                                    text: "This Employee ID already have an account",
+                                    type: "error"
+                                });
+                            }
+
+
+                            if (data.userADResult > 0) {
+                                _valid = 0;
+                                $("#form").steps("previous");
+                                swal({
+                                    title: "Unable to proceed",
+                                    text: "This Username already have an account",
+                                    type: "error"
+                                });
+                            }
+
+                            if (_valid == 1) {
+                                $("#CompanyEmail").val(data.employeeData['companyEmail']);
+                                $("#AlternativeEmail").val(data.employeeData['alternativeEmail']);
+                                $("#MobileNumber").val(data.employeeData['mobileNumber']);
+                                $("#LocalNumber").val(data.employeeData['localNumber']);
+                            }
+                            else {
+                                $("#CompanyEmail").val("");
+                                $("#AlternativeEmail").val("");
+                                $("#MobileNumber").val("");
+                                $("#LocalNumber").val("");
+
+                            }
+
+
+
+                        } else {
+                            $("#form").steps("previous");
+
+                            //$("#progressBar").css('width', "100%");
+                            swal({
+                                title: "Unable to proceed",
+                                text: data.result,
+                                type: "error"
+                            });
+                        }
+
+
+
+                    }
+                });
+
+        }
+
+        function GoSaveUser() {
+            var checkwindows = 0;
+
+            if ($('#checkWindows').is(':checked')) {
+                checkwindows = 1;
+            }
+
+             swal({
+                title: "Are you sure?",
+                text: "This will create an account for you.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Proceed!",
+                 closeOnConfirm: false
+             }, function () {
+                 //swal.close()
+                 $("#ModalLoading").modal("show");
+                 $("#ModalLoading").css('display', 'block');
+                 $.ajax({
+                    type: "POST",
+                     url: "@Url.Content("~/accounts/create")",
+                     data: $("#form").serialize()+"&checkwindows="+checkwindows,
+                     //contentType: "application/json; charset=utf-8",
+                    dataType: "JSON",
+                     success: function (data, textStatus, jqXHR) {
+                         if (data.success == 1) {
+                             $("#ModalLoading").css('display', 'none');
+                                 swal({
+                                     title: "Success",
+                                     text: "Account created! You will redirected to the login page after clicking (OK)",
+                                     type: "success"
+                                 },
+                                function () {
+                                    window.location.href = "@Url.Content("~/accounts/login")";
+                                 });
+
+                         } else {
+                             $("#ModalLoading").css('display', 'none');
+                             swal("Error!", data.message, "error");
+                         }
+
+                         $("#ModalLoading").css('display', 'none');
+                     }
+
+                });
+
+            });
+        }
+
+
+
+        function ShowPassword(id) {
+
+            if ($("#" + id).attr('type') == "password") {
+                $("#" + id).attr('type', 'text');
+                $("#icon_" + id).attr('class', 'fa fa-eye');
+            } else {
+                $("#" + id).attr('type', 'password');
+                $("#icon_" + id).attr('class', 'fa fa-eye-slash');
+            }
+        }
+
+        function checkMethod() {
+
+            if ($('#checkWindows').is(':checked')) {
+                $(".windowGroup").removeClass("hidden");
+                $(".localGroup").addClass("hidden");
+                $(".localGroup").addClass("hidden");
+            }
+            else {
+                $(".windowGroup").addClass("hidden");
+                $(".localGroup").removeClass("hidden");
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>
+
+

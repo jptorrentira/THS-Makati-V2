@@ -1,0 +1,34 @@
+
+         USE [ShuttleReservationDB]
+GO
+/****** Object:  StoredProcedure [dbo].[AutoExpireAlternateHead]    Script Date: 11/25/2019 3:15:43 PM ******/
+        SET ANSI_NULLS ON
+        GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE[dbo].[AutoExpireAlternateHead]
+        AS
+BEGIN
+
+    Update Employees set AlternateImmediateHeadValidity = 'True' where convert(varchar, AlternateImmediateHeadValidFrom, 23) <= convert(varchar, GETDATE(), 23) AND convert(varchar, AlternateImmediateHeadValidTo, 23) >= convert(varchar, GETDATE(), 23);
+        Update Employees set AlternateImmediateHeadValidity = 'False' where convert(varchar, AlternateImmediateHeadValidTo, 23) < convert(varchar, GETDATE(), 23);
+        update ShuttlePassengers set InitialApproverEmployeeNo = (select CASE
+        WHEN s.AlternateImmediateHeadValidity = 0 THEN s.EmployeeNo
+    
+        ELSE s.AlternateImmediateHead
+    END
+    from Employees e join Employees s on e.SupervisorEmployeeNo = s.EmployeeNo where e.Id = ShuttlePassengers.EmployeeId) where Status in (1,6) and PassengerTypeId = 2;
+
+        update ShuttlePassengers set InitialApproverEmployeeNo = (select CASE
+            WHEN s.AlternateImmediateHeadValidity = 0 THEN s.EmployeeNo
+        
+            ELSE s.AlternateImmediateHead
+        END
+        from Employees e join Employees s on e.SupervisorEmployeeNo = s.EmployeeNo where e.EmployeeNo = ShuttlePassengers.EmployeeNo) where Status in (1,6) and PassengerTypeId = 1;
+
+        END

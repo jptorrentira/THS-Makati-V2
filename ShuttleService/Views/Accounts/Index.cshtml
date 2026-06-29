@@ -1,0 +1,284 @@
+﻿
+@{
+    ViewData["Title"] = "User List";
+}
+
+<style>
+    .select2-container {
+        z-index: 99999 !important;
+    }
+</style>
+<div class="wrapper-content row">
+    <div class="col-md-10 pull-left">
+        <h4>User List</h4>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+    <div class="row">
+        <div class=" col-sm-12">
+            <table id="data_table_users" class="table table-striped table-bordered table-hover text-center table100"></table>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" role="dialog" id="modal-user" style="z-index: 9990!important;" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-md" role="document">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>User Information</h3>
+            </div>
+            <form id="formUser">
+                <div class="modal-body form-horizontal">
+
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Employee Number </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm " disabled id="EmployeeNumber" name="EmployeeNumber" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Domain</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm " disabled id="Domain" name="Domain" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> User Name </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm " disabled id="UserName" name="UserName" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Display Name </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm hidden" disabled id="UserId" name="UserId" />
+                                <input class="form-control input-sm " disabled id="DisplayName" name="DisplayName" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Company </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm " disabled id="Company" name="Company" />
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Roles </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <select name="RoleId" id="RoleId" asp-items="ViewBag.Roles" style="z-index: 99999!important;" multiple class="form-control">
+                                   @* <option disabled selected>--- SELECT ---</option>*@
+                                </select>
+                                @*<button class="btn btn-primary" type="button" id="AddUserRole"> Add Role</button>*@
+                            </div>
+                        </div>
+                    </div>
+
+                    @*<div class="row">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Role </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input class="form-control input-sm " disabled id="RoleId" name="RoleId" />
+                                </div>
+                            </div>
+                        </div>*@
+
+
+                </div>
+            </form>
+            <div class="modal-footer">
+                <div class="btn-group pull-right">
+                    <button class="ladda-button btn btn-primary" onClick="SaveUpdate();" id="btnSave" type="button" data-style="expand-left">Save</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<environment include="Production">
+
+</environment>
+
+<environment include="Development,Staging,Production">
+    <!-- DataTables -->
+    @section Scripts {
+        <script src="https://repo.aunasin.com/assets/tths/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="https://repo.aunasin.com/assets/tths/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="https://repo.aunasin.com/assets/tths/vendors/datatables.net/js/dataTables.select.min.js"></script>
+    }
+</environment>
+
+<script>
+
+
+
+    var reloader = 0;
+    var table1 = $('#data_table_users').DataTable({
+            "processing": false,
+            "serverSide": true,
+            "autoWidth": false,
+            "searching": true,
+            "scrollX": true,
+            "bLengthChange": false,
+            "ajax": {
+                "url": "@Url.Content("~/accounts/ShowUserLists")",
+                "type": "POST"
+            },
+        "columns": [
+
+                { "data": "id", title: "ID", width: "5%", align: "center", visible: false, orderable: false },
+                { "data": "action", title: "Action", orderable: false },
+                { "data": "displayName", title: "Full Name", orderable: false },
+                { "data": "domain", title: "Domain", orderable: false },
+                { "data": "userName", title: "Username", orderable: false },
+                { "data": "employeeNo", title: "Employee No", orderable: false },
+                { "data": "company", title: "Company", orderable: false },
+                { "data": "status", title: "Status", orderable: false }
+
+            ]
+            ,
+            'select': {
+                'style': 'single'
+            },
+            'columnDefs': [
+                {
+                    "targets": "_all", // your case first column
+                    "className": "text-center",
+                }],
+            "order": [[0, "desc"]],
+            "initComplete": function (settings, json) {
+                if (reloader == 0) {
+                    reloader = 1;
+                    var myVar = setInterval(function () {
+                        $('#data_table_users').DataTable().columns.adjust().draw();
+                        clearInterval(myVar);
+                    }, 500);
+
+                }
+            }
+        });
+
+    function EditUser(id) {
+
+            $("#UserId").val("");
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/accounts/updateRole")?id=" + id,
+
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        if (data.success == 1) {
+
+                            $("#EmployeeNumber").val(data['userData'][0].employeeNumber);
+                            $("#Domain").val(data['userData'][0].domain);
+                            $("#UserName").val(data['userData'][0].userName);
+                            $("#DisplayName").val(data['userData'][0].displayName);
+                            $("#Company").val(data['userData'][0].company);
+                            $("#UserId").val(data['userData'][0].userId);
+
+                            var _roleIds = [];
+                            var _x = 0;
+                            $.each(data['roleId'], function (index, value) {
+                                _roleIds[_x] = value.roleIds;
+                                _x++;
+                            });
+
+                            $("#RoleId").val(_roleIds).trigger("change");
+                            $("#modal-user").modal("show");
+
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                    }
+                });
+    }
+
+    $("#RoleId").select2({
+        width: '100%'
+    });
+
+    function SaveUpdate() {
+        
+        if ($("#RoleId").val() == null ) {
+
+            swalAlertOnly("Error", "Please select a role.", "error");
+        }
+        else {
+            swal({
+                title: "Are you sure?",
+                text: "This will update the role for this user",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Save it!",
+                closeOnConfirm: false
+            }, function () {
+
+                SubmitForm();
+
+            });
+        }
+
+    }
+
+    
+    function SubmitForm() {
+        $("#loading").modal("show");
+
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/accounts/saveUserRole/")" + $("#UserId").val(),
+                    data: $("#formUser").serialize() + "&UserId=" + $("#UserId").val(),
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        //console.log(data);
+                        if (data.success == 1) {
+                            $('#data_table_users').DataTable().clear().draw();
+                            $('#data_table_users').DataTable().ajax.reload();
+                            $("#modal-user").modal("hide");
+                            swalAlertOnly("Success", data.message, "success");
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                        $("#loading").modal("hide");
+                    }
+        });
+
+
+    }
+
+</script>

@@ -1,0 +1,80 @@
+﻿@model ShuttleService.Models.Employee
+
+@{
+    ViewData["Title"] = "Employee Maintenance";
+}
+
+<div class="wrapper-content row">
+    <div class="col-md-10 pull-left">
+        <h4>Employee Maintenance</h4>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+    <div class="">
+        <div class="row">
+            <div class=" col-sm-12">
+                <label class="hidden">@ViewBag.MachineName</label>
+                <a href="@Url.Content("~/employees/create")" class="btn btn-warning">Create</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class=" col-sm-12">
+                <table id="data_table_employees" class="table table-striped table-bordered table-hover text-center table100"></table>
+            </div>
+        </div>
+    </div>
+ </div>
+
+
+<script>
+    var reloader = 0;
+    var table1 = $('#data_table_employees').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+        "searching": true,
+        "scrollX": true,
+        "bLengthChange": false,
+        "ajax": {
+            "url": "@Url.Content("~/employees/ShowEmployeeLists")",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "id", title: "Action",width: "5%",align:"center", orderable: false},
+            { "data": "firstName", title: "First Name", orderable: false },
+            { "data": "middleName", title: "Middle Name", orderable: false },
+            { "data": "lastName", title: "Last Name", orderable: false },
+            { "data": "employeeID", title: "Employee No", orderable: false },
+            { "data": "company", title: "Company", orderable: false },
+            { "data": "position", title: "Position", orderable: false },
+            { "data": "isSupervisor", title: "Is Supervisor", orderable: false },
+            { "data": "supervisor", title: "Supervisor", orderable: false },
+            { "data": "isLocked", title: "Is Locked", orderable: false },
+            
+        ]
+        ,
+        'select': {
+            'style': 'single'
+        },
+        'columnDefs': [
+            {
+                "targets": "_all", // your case first column
+                "className": "text-center",
+            }],
+        "order": [[0, "desc"]],
+        "initComplete": function (settings, json) {
+            if (reloader == 0) {
+                reloader = 1;
+                var myVar = setInterval(function () {
+                    $('#data_table_employees').DataTable().columns.adjust().draw();
+                    clearInterval(myVar);
+                }, 500);
+
+            }
+        }
+    });
+
+
+
+</script>

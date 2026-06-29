@@ -1,0 +1,298 @@
+﻿@model ShuttleService.Models.Employee
+
+@{
+    ViewData["Title"] = "Immediate Head List";
+}
+<style>
+    .select2-container {
+        z-index: 99999 !important;
+    }
+</style>
+<div class="wrapper-content row">
+    <div class="col-md-10 pull-left">
+        <h4>Immediate Head List</h4>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+    <div class="">
+        <div class="row">
+            <div class=" col-sm-12">
+                <table id="data_table_heads" class="table table-striped table-bordered table-hover text-center table100"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" role="dialog" id="modal-alternate" style="z-index: 9992!important;" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md" role="document">            
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Alternate Immediate Head</h3>
+                </div>
+                <form id="formAlternate">
+                <div class="modal-body form-horizontal">
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Immediate Head </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm hidden" disabled id="ImmediateHeadId" name="ImmediateHeadId" />
+                                <input class="form-control input-sm " disabled id="ImmediateHeadName" name="ImmediateHeadName" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label">Alternate Immediate Head</label>
+                            </div>
+                            <div class="col-md-8">
+                                <select id="AlternateImmediateHead" name="AlternateImmediateHead" style="z-index: 9993!important;" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label">Valid From</label>
+                            </div>
+                            <div class="col-md-8">
+                                <input class="form-control input-sm datepicker" onchange="ReloadCalendarPicker();" id="AlternateImmediateHeadValidFrom"  name="AlternateImmediateHeadValidFrom"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label">Valid To</label>
+                            </div>
+                            <div class="col-md-8">
+                                <input class="form-control input-sm datepicker" disabled id="AlternateImmediateHeadValidTo"  name="AlternateImmediateHeadValidTo"/>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                </form>
+                <div class="modal-footer">
+                    <div class="btn-group pull-right">
+                        <button class="ladda-button btn btn-primary" onClick="SaveAlternate();" id="btnSave" type="button" data-style="expand-left">Save</button>
+                        <button class="btn btn-danger" type="button" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+     </div><!-- /.modal -->
+
+
+
+
+<script>      
+    var reloader = 0;
+    var table1 = $('#data_table_heads').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+        "searching": true,
+        "scrollX": true,
+        "bLengthChange": false,
+        "ajax": {
+            "url": "@Url.Content("~/employees/ShowHeadLists")",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "id", title: "Action",width: "5%",align:"center", orderable: false},
+            { "data": "fullName", title: "Full Name", orderable: false },
+            { "data": "employeeID", title: "Employee No", orderable: false },
+            { "data": "company", title: "Company", orderable: false },
+            { "data": "position", title: "Position", orderable: false },
+            { "data": "alternateSupervisor", title: "Alternate Supervisor", orderable: false },
+            { "data": "alternateDateFrom", title: "From", orderable: false },
+            { "data": "alternateDateTo", title: "To", orderable: false },
+            { "data": "isAlternateValid", title: "Is Valid", orderable: false },
+        ]
+        ,
+        'select': {
+            'style': 'single'
+        },
+        'columnDefs': [
+            {
+                "targets": "_all", // your case first column
+                "className": "text-center",
+            }],
+        "order": [[0, "desc"]],
+        "initComplete": function (settings, json) {
+            if (reloader == 0) {
+                reloader = 1;
+                 var myVar = setInterval(function () {
+                    $('#data_table_heads').DataTable().columns.adjust().draw();
+                    clearInterval(myVar);
+                }, 500);
+
+            }
+        }
+    });
+
+    
+
+    $('#AlternateImmediateHeadValidFrom').datepicker({
+        keyboardNavigation: false,
+        forceParse: false,
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function ReloadCalendarPicker() {
+
+        if ($('#AlternateImmediateHeadValidFrom').val() == "") {
+
+            $('#AlternateImmediateHeadValidTo').val("");
+            $('#AlternateImmediateHeadValidTo').attr("disabled");
+
+        } else {
+            $('#AlternateImmediateHeadValidTo').val("");
+            $('#AlternateImmediateHeadValidTo').removeAttr("disabled");
+            $('#AlternateImmediateHeadValidTo').datepicker("remove").datepicker({
+                keyboardNavigation: false,
+                forceParse: false,
+                autoclose: true,
+                todayHighlight: false,
+                startDate: $('#AlternateImmediateHeadValidFrom').val()
+            });
+            $("#AlternateImmediateHeadValidTo").datepicker("option", "startDate", $('#AlternateImmediateHeadValidFrom').val());
+        }
+
+
+    }
+
+  
+        function UpdateAlternateHead(id) {
+
+
+            $("#ImmediateHeadId").val("");
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/employees/checkAlternate")?id=" + id,
+               
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        if (data.success == 1) {
+                            //default
+                            var newOption = new Option(data.supName, data.alternateImmediateHead, true, true);
+                            // Append it to the select
+                            $('#AlternateImmediateHead').append(newOption).trigger('change');
+                            
+                            if ($.trim(data.alternateImmediateHeadValidFrom) == "") {
+                                $("#AlternateImmediateHeadValidFrom").datepicker("setDate", null);
+                            } else {
+                                $('#AlternateImmediateHeadValidFrom').datepicker('setDate', data.alternateImmediateHeadValidFrom);
+                            }
+
+                            if ($.trim(data.alternateImmediateHeadValidTo) == "") {
+                                $("#AlternateImmediateHeadValidTo").datepicker("setDate", null);
+                                $("#AlternateImmediateHeadValidTo").attr("disabled", true);
+                            } else {
+                                $('#AlternateImmediateHeadValidTo').datepicker('setDate', data.alternateImmediateHeadValidTo);
+                            }
+
+                            $("#ImmediateHeadName").val(data.immediateHeadName);
+                            $("#ImmediateHeadId").val(data.id);
+                            //end default
+                                $("#modal-alternate").modal("show");
+                            
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                    }
+                });
+    }
+
+    $("#AlternateImmediateHead").select2({
+            ajax: {
+                type: "POST",
+                url: "@Url.Content("~/employees/getSupervisorData")",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.items
+                    };
+                },
+                cache: false
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+
+    function SaveAlternate() {
+
+        if ($("#ImmediateHeadId").val() == "" || $("#AlternateImmediateHead").val() == "" || $("#AlternateImmediateHeadValidFrom").val() == "" || $("#AlternateImmediateHeadValidTo").val() == "")  {
+
+            swalAlertOnly("Error", "Please complete all fields.", "error");
+        }
+        else {
+                swal({
+                    title: "Are you sure?",
+                    text: "This will update the alternate head for this employee",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Save it!",
+                    closeOnConfirm: false
+                }, function () {
+
+                    SubmitForm();
+
+                });
+        }
+
+
+    }
+
+    function SubmitForm() {
+        var l = $('#btnSave').ladda();
+        l.ladda('start');
+        $(".btn").attr("disabled", "disabled");
+        $(".confirm").attr("disabled", "disabled");
+        $(".cancel").attr("disabled", "disabled");
+        
+
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/employees/saveAlternateSup/")"+ $("#ImmediateHeadId").val(),
+                    data: $("#formAlternate").serialize() + "&ImmediateHeadId=" + $("#ImmediateHeadId").val(),
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        if (data.success == 1) {
+                            $('#data_table_heads').DataTable().clear().draw();
+                            $('#data_table_heads').DataTable().ajax.reload();
+                            $("#modal-alternate").modal("hide");
+                            swalAlertOnly("Success", data.message, "success");
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                        l.ladda('stop');
+                        $(".btn").removeAttr("disabled");
+                        $(".confirm").removeAttr("disabled");
+                        $(".cancel").removeAttr("disabled");
+                    }
+        });
+
+
+    }
+
+        </script>

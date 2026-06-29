@@ -1,0 +1,224 @@
+﻿@model ShuttleService.Models.Employee
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="wrapper-content row">
+            <div class="col-md-10 pull-left">
+                <h4>Employee Maintenance - New</h4>
+            </div>
+        </div>
+
+        <div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+            <form asp-action="Create" id="PageForm" class="form-horizontal">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 style="color:#1ab394">Employee Information</h3>
+                        <hr />
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="EmployeeNo" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="EmployeeNo" class="form-control" />
+                                <span asp-validation-for="EmployeeNo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="FirstName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MiddleName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="MiddleName" class="form-control" />
+                                <span asp-validation-for="MiddleName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LastName" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Position" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="Position" class="form-control" />
+                                <span asp-validation-for="Position" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyGroupId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="CompanyGroupId" class="form-control select2simple" onchange="checkCompanyList();" asp-items="ViewBag.CompanyGroupId"></select>
+                                <option value=""></option>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyListId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="CompanyListId" class="form-control select2simple" onchange="checkDepartment();" asp-items="ViewBag.CompanyListId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group" id="locationField" style="display: none;">
+                            <label asp-for="LocationIds" class="control-label col-md-3">Location/s</label>
+                            <div class="col-md-8">
+                                <select asp-for="LocationIds" class="form-control select2simple" multiple asp-items="ViewBag.LocationListId">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Gender" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="Gender" class="form-control" />
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="NationalityId" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <select asp-for="NationalityId" class="form-control" asp-items="ViewBag.NationalityId"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MobileNumber" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="MobileNumber" class="form-control" />
+                                <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LocalNumber" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="LocalNumber" class="form-control" />
+                                <span asp-validation-for="LocalNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="CompanyEmail" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="CompanyEmail" class="form-control" />
+                                <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="AlternativeEmail" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="AlternativeEmail" class="form-control" />
+                                <span asp-validation-for="AlternativeEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="SupervisorEmployeeNo" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+
+                                <select asp-for="SupervisorEmployeeNo" class="form-control" asp-items="ViewBag.SupervisorEmployeeNo"></select>
+                                @*<input asp-for="SupervisorEmployeeNo" class="form-control" />*@
+                                <span asp-validation-for="SupervisorEmployeeNo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+
+                                <div class="checkbox checkbox-info">
+                                    <input id="IsImmediateHead" name="IsImmediateHead" value="false" type="checkbox" class="ebeBoolean" />
+
+                                    <label for="IsImmediateHead"> Please check here to identify that he/she is an immediate head</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button type="button" id="btnCreate" class="ladda-button btn btn-primary" data-style="expand-left">Create</button>
+                                    <a id="backtolist" class="btn btn-warning">Back to List</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label asp-for="Status" class="control-label col-md-3"></label>
+                            <div class="col-md-8">
+                                <input asp-for="Status" class="form-control" />
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+
+
+                            <div class="row hidden">
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHead" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHead" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHead" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHeadValidFrom" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHeadValidFrom" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHeadValidFrom" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="AlternateImmediateHeadValidTo" class="control-label"></label>
+                                    <input asp-for="AlternateImmediateHeadValidTo" class="form-control" />
+                                    <span asp-validation-for="AlternateImmediateHeadValidTo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input asp-for="AlternateImmediateHeadValidity" /> @Html.DisplayNameFor(model => model.AlternateImmediateHeadValidity)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="EncodedBy" class="control-label"></label>
+                                    <input asp-for="EncodedBy" class="form-control" />
+                                    <span asp-validation-for="EncodedBy" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="LastModifiedBy" class="control-label"></label>
+                                    <input asp-for="LastModifiedBy" class="form-control" />
+                                    <span asp-validation-for="LastModifiedBy" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="EncodeDate" class="control-label"></label>
+                                    <input asp-for="EncodeDate" class="form-control" />
+                                    <span asp-validation-for="EncodeDate" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="ModifyDate" class="control-label"></label>
+                                    <input asp-for="ModifyDate" class="form-control" />
+                                    <span asp-validation-for="ModifyDate" class="text-danger"></span>
+                                </div>
+                                @*<div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                    </div>*@
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+               
+                <hr />
+            </form>
+        </div>
+
+
+    </div>
+</div>

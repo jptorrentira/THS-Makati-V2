@@ -1,0 +1,285 @@
+﻿
+@{
+    ViewData["Title"] = "Reports";
+    var companyGroupId = ViewData["CompanyGroupId"];
+    var companyGroupName = ViewData["CompanyGroupName"];
+}
+<style>
+    #report_table {
+        position: absolute;
+        left: -9999px; /* moves it off-screen */
+    }
+
+</style>
+<h2>Reports</h2>
+
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+
+    <div class="form-group">
+
+        <div class="row  form-group">
+            <div class=" col-sm-1">
+                <label>Report Type:</label>
+            </div>
+            <div class=" col-sm-6">
+                @if (companyGroupName.Equals("MINESITE"))
+                {
+                    <select id="filterStatus" class="form-control input-sm select2" onchange="checkFilter();" name="filterStatus">
+                        <option value="1" selected>Monthly Report (Driver / Vehicle)</option>
+                        <option value="3">Monthly Report (Summary)</option>
+                        <option value="4">Charging Report</option>
+                        <option value="5">Out Of Town Trips Report</option>
+                        <option value="6">Driver Survey Report Per Transaction</option>
+                        <option value="7">Driver Survey Report Summary</option>
+                        <option value="8">Vehicle Monitoring Report</option>
+                    </select>
+                }
+                else if ((companyGroupName.Equals("SMPC")))
+                {
+                    <select id="filterStatus" class="form-control input-sm select2" onchange="checkFilter();" name="filterStatus">
+                        <option value="1" selected>Monthly Report (Driver / Vehicle)</option>
+                        <option value="2">Monthly Report (Shuttle)</option>
+                        <option value="3">Monthly Report (Summary)</option>
+                        <option value="4">Charging Report</option>
+                        <option value="5">Out Of Town Trips Report</option>
+                        <option value="6">Driver Survey Report Per Transaction</option>
+                        <option value="7">Driver Survey Report Summary</option>
+                        <option value="9">Parcel Delivery</option>
+                    </select>
+                } 
+                else
+                {
+                    <select id="filterStatus" class="form-control input-sm select2" onchange="checkFilter();" name="filterStatus">
+                        <option value="1" selected>Monthly Report (Driver / Vehicle)</option>
+                        <option value="2">Monthly Report (Shuttle)</option>
+                        <option value="3">Monthly Report (Summary)</option>
+                        <option value="4">Charging Report</option>
+                        <option value="5">Out Of Town Trips Report</option>
+                        <option value="6">Driver Survey Report Per Transaction</option>
+                        <option value="7">Driver Survey Report Summary</option>
+                    </select>
+                }                
+
+            </div>
+        </div>
+
+        <div class="row form-group filterCalendar">
+            <div class=" col-sm-1">
+                <label> From </label>
+            </div>
+            <div class=" col-sm-6">
+                    <input class="form-control input-sm datepicker" id="dateFrom" name="dateFrom" />
+            </div>
+        </div>
+
+        <div class="row form-group filterCalendar">
+            <div class="col-sm-1">
+                <label> To </label>
+            </div>
+            <div class=" col-sm-6">
+                    <input class="form-control input-sm datepicker" id="dateTo" name="dateTo" />
+            </div>
+        </div>
+
+        <div class="row form-group filterQuarter">
+            <div class=" col-sm-1">
+                <label> Quarter </label>
+            </div>
+            <div class=" col-sm-6">
+                <select id="quarter" class="form-control input-sm select2" name="quarter">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group filterQuarter">
+            <div class=" col-sm-1">
+                <label> Year </label>
+            </div>
+            <div class=" col-sm-6">
+                <select id="year" class="form-control input-sm select2" name="year"></select>
+            </div>
+        </div>
+        <hr />
+        <button class="ladda-button btn btn-primary" onClick="GenerateReport();" id="GenerateReport" type="button" data-style="expand-left">GenerateReport</button>
+
+        </div>
+
+        <div id="vehicleMonitoring" class="wrapper-content">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>From:</label>
+                    <input type="date" id="reportFrom" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>To:</label>
+                    <input type="date" id="reportTo" class="form-control" />
+                </div>                
+            </div>
+            <div class="align-self-end" style="margin-top: 10px; margin-bottom: 10px;">
+                <button id="generateVehicleMonitoringReport" class="btn btn-primary">Generate Report</button>
+            </div>
+            <div class="align-self-end" id="exportButtons" style="display:none;">
+                <!-- Export buttons will appear here -->
+            </div>
+        </div>
+
+        <!-- Hidden table for exporting -->
+        <table id="report_table">
+            <thead>
+                <tr>
+                    <th>Trip Date & Time</th>
+                    <th>Plate Number</th>
+                    <th>Model</th>
+                    <th>Capacity</th>
+                    <th>Driver</th>
+                    <th>Status</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                </tr>
+            </thead>
+        </table>
+
+
+</div>
+<script>
+    $(document).ready(function () {
+        var reportTable;
+
+        $('#generateVehicleMonitoringReport').click(function () {
+            var fromDate = $('#reportFrom').val();
+            var toDate = $('#reportTo').val();
+            if (reportTable) {
+                // Reload existing table with new filters
+                reportTable.ajax.reload(null, false);
+                return;
+            }
+
+
+            // Initialize DataTable
+            reportTable = $('#report_table').DataTable({
+                "processing": true,
+                "serverSide": false, // <-- load all filtered data to client for export
+                "ajax": {
+                    "url": "@Url.Action("GetVehicleMonitoringDataReport", "VehicleMonitoring")",
+                    "type": "POST",
+                    "data": function (d) {
+                        // always fetch current values
+                        d.fromDate = $('#reportFrom').val();
+                        d.toDate = $('#reportTo').val();
+                    }
+                },
+                "columns": [
+                    { "data": "tripDateTime" },
+                    { "data": "plateNumber" },
+                    { "data": "model" },
+                    { "data": "capacity" },
+                    { "data": "driver" },
+                    { "data": "status" },
+                    { "data": "origin" },
+                    { "data": "destination" }
+                ],
+                dom: 'B',
+                buttons: [
+                    {
+                        extend: 'csv',
+                        text: 'Export CSV',
+                        className: 'btn btn-sm btn-secondary',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'excel',
+                        text: 'Export Excel',
+                        className: 'btn btn-sm btn-secondary',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'Export PDF',
+                        className: 'btn btn-sm btn-secondary',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        exportOptions: { columns: ':visible' }
+                    }
+                ],
+                "initComplete": function () {
+                    // Move buttons to visible div and show
+                    reportTable.buttons().container().appendTo('#exportButtons');
+                    $('#exportButtons').show();
+                }
+            });
+        });
+    });
+
+
+    function GenerateReport() {
+        switch ($("#filterStatus").val()) {
+            case '1':
+                window.open("@Url.Content("~/reports/DriverMonthlyReport")" + "?t=1&_start=" + $("#dateFrom").val() + "&_end=" + $("#dateTo").val() + "&_companyGroupId=" + "@companyGroupId", '_blank');
+                break;
+            case '2':
+                window.open("@Url.Content("~/reports/ShuttleMonthlyReport")" + "?t=1&_start=" + $("#dateFrom").val() + "&_end=" + $("#dateTo").val() + "&_companyGroupId=" + "@companyGroupId", '_blank');
+                break;
+            case '3':
+                window.open("@Url.Content("~/reports/SummaryMonthlyReport")" + "?t=1&_start=" + $("#dateFrom").val() + "&_end=" + $("#dateTo").val() + "&_companyGroupId=" + "@companyGroupId", '_blank');
+                break;
+            case '4':
+                window.open("@Url.Content("~/reports/ChargingReport")" + "?t=1&_start=" + $("#dateFrom").val() + "&_end=" + $("#dateTo").val() + "&_companyGroupId=" + "@companyGroupId", '_blank');
+                break;
+            case '5':
+                window.open("@Url.Content("~/reports/OutoftownTrip")" + "?t=1&_start=" + $("#dateFrom").val() + "&_end=" + $("#dateTo").val() + "&_companyGroupId=" + "@companyGroupId", '_blank');
+                break;
+            case '6':
+                window.open("@Url.Content("~/reports/SurveyPerTransaction")" + "?t=1&_q=" + $("#quarter").val() + "&_y=" + $("#year").val() + "&_companyGroupId=" + "@companyGroupId", '_blank');
+                break;
+            case '7':
+                window.open("@Url.Content("~/reports/SurveyPerDriver")" + "?t=1&_q=" + $("#quarter").val() + "&_y=" + $("#year").val() + "&_companyGroupId=" + "@companyGroupId", '_blank');
+                break;
+            case '9':
+                window.open("@Url.Content("~/parcel/ParcelReport")" + "?from=" + $("#dateFrom").val() + "&to=" + $("#dateTo").val(), '_blank');
+                break;
+            default:
+                alert();
+                break;
+        }
+    }
+
+    checkFilter();
+    function checkFilter() {
+        if ($("#filterStatus").val() == 6 || $("#filterStatus").val() == 7) {
+            $(".filterCalendar").addClass('hidden');
+            $(".filterQuarter").removeClass('hidden');
+            $("#vehicleMonitoring").addClass('hidden');
+            $("#GenerateReport").removeClass('hidden');
+        }
+        else if ($("#filterStatus").val() == 8) {
+            $(".filterCalendar").addClass('hidden');
+            $(".filterQuarter").addClass('hidden');
+            $("#GenerateReport").addClass('hidden');
+
+
+            $("#vehicleMonitoring").removeClass('hidden');
+        }
+        else {
+            $(".filterCalendar").removeClass('hidden');
+            $(".filterQuarter").addClass('hidden');
+            $("#vehicleMonitoring").addClass('hidden');
+            $("#GenerateReport").removeClass('hidden');
+        }
+    }
+
+    var year = new Date().getFullYear();
+    for (var i = year; i >= 2020; i--) {
+        $("#year").append('<option value="' + i + '">' + i + '</option>');
+    }
+
+        $('.datepicker').datepicker({
+            keyboardNavigation: false,
+            forceParse: false,
+            autoclose: true,
+            todayHighlight: false
+        });
+</script>

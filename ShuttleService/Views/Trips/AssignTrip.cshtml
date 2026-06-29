@@ -1,0 +1,691 @@
+﻿@model ShuttleService.Models.Trip
+
+@{
+    ViewData["Title"] = "Assign Driver / Vehicle";
+    var _dhead = ViewData["DriverPassengerHeaders"] as DriverPassengerHeader;
+    var _dtrip = ViewData["Trip"] as Trip;
+}
+<style>
+
+    .clockpicker-popover {
+        z-index: 99992 !important;
+    }
+
+    .select2-container {
+        z-index: 99992 !important;
+    }
+
+    #createTrip {
+        z-index: 99991 !important;
+    }
+</style>
+
+
+<div class="wrapper-content row">
+    <div class="col-md-6 pull-left">
+        <h4>Driver/Vehicle Schedule - <red style="color:red">@ViewBag.dtimestamp</red></h4>
+    </div>
+
+    <div class="col-md-6 ">
+        <div class="btn-group pull-right">
+            @if(ViewBag.OverAllApprover == 1) {
+                <button type="button" class="btn btn-w-m btn-warning" onclick="OpenModalAddPassengerByPass();">Add New Passenger (Bypass)</button>
+            }
+            <button type="button" class="btn btn-w-m btn-danger " onclick="GoBack('@Url.Content("~/trips/detailsDriver?d=")@ViewBag.dget')">Back</button>
+        </div>
+    </div>
+
+    @*<div class="col-md-2">
+            <button type="button" class="btn btn-w-m btn-primary btn-block" onclick="Reservation();">Add New Trip</button>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-w-m btn-success btn-block" onclick="Reservation();">View Trips</button>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-w-m btn-danger btn-block" onclick="GoBack('@Url.Content("~/shuttlepassengers")')">Back</button>
+        </div>*@
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+    <div class="">
+        <div class="row">
+            <div class=" col-sm-12">
+                <table id="requestdetails" class="table100">
+                    <thead>
+                        <tr>
+                            <th width="10%"></th>
+                            <th width="2.5%"></th>
+                            <th width="30%"></th>
+                            <th width="5%"></th>
+                            <th width="10%"></th>
+                            <th width="2.5%"></th>
+                            <th width="30%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Date Filed</b></td>
+                            <td>:</td>
+                            <td>@_dhead.EncodeDate</td>
+                            <td></td>
+                            <td><b>Schedule Date</b></td>
+                            <td>:</td>
+                            <td>@ViewBag.TripDate</td>
+                        </tr>
+                        <tr>
+                            <td><b>Requested By</b></td>
+                            <td>:</td>
+                            <td>@ViewBag.RequestedBy </td>
+                            <td></td>
+                            <td><b>Time Duration</b></td>
+                            <td>:</td>
+                            <td>@_dhead.TripTimeFrom - @_dhead.TripTimeTo</td>
+                        </tr>
+                        <tr>
+                            <td><b>Charge to</b></td>
+                            <td>:</td>
+                            <td>@ViewBag.ChargeTo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class=" col-sm-12">
+                <label style="font-style:italic;">Passengers</label>
+                <br />
+                <table id="tableDriverVehicle" class="table table-striped table-bordered table-hover text-center table100 ">
+                    <thead>
+                        <tr>
+                            <th class="text-center ebeTable">
+                            </th>
+                            <th class="text-center ebeTable">
+                            </th>
+                            <th class="text-center ebeTable">
+                            </th>
+                            <th class="text-center ebeTable">
+                            </th>
+                            <th class="text-center ebeTable">
+                            </th>
+                            <th class="text-center ebeTable">
+                            </th>
+                            <th class="text-center ebeTable">
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class=" col-sm-6">
+                <div class="modal-body form-horizontal">
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Trip Type </label>
+                            </div>
+                            <div class="col-sm-8">
+                                @ViewBag.ServiceType
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Destination </label>
+                            </div>
+                            <div class="col-sm-8">
+                                @_dhead.Origin - @_dhead.Destination
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Instruction </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <p>
+                                    @_dhead.Instructions
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Purpose </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <p>
+                                    @_dhead.Purpose
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <form id="formTrip">
+                    <div class="modal-body form-horizontal">
+
+                        <div class="row hidden">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Trip Type </label>
+                                </div>
+                                <div class="col-sm-8">
+
+                                    <input class="form-control input-sm hidden" value="@_dhead.ServiceTypeId" disabled id="ServiceTypeId" name="ServiceTypeId" />
+                                    <input class="form-control input-sm hidden" value="@ViewBag.unixtimeFormatted" disabled id="ServiceDateTimeStamp" name="ServiceDateTimeStamp" />
+                                    @*<select asp-for="ReservationTypeId" class="form-control" asp-items="ViewBag.ReservationTypeId"></select>*@
+                                    <select id="ReservationTypeId" name="ReservationTypeId" class="form-control">
+                                        <option value="2" selected>Driver Reservation</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Time From </label>
+                                </div>
+                                <div class="col-sm-8">
+
+                                    <div class="input-group clockpicker" data-autoclose="true">
+                                        <input type="text" id="ServiceStartDate" name="ServiceStartDate" data-mask="99:99" onchange="clearOtherDate();" class="form-control" value="00:00">
+                                        <span class="input-group-addon">
+                                            <span class="fa fa-clock-o"></span>
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Time Until </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="input-group clockpicker" data-autoclose="true">
+                                        <input type="text" id="ServiceEndDate" name="ServiceEndDate" data-mask="99:99" onblur="checktime();" onchange="reInitVehicleDriver();" class="form-control" value="00:00">
+                                        <span class="input-group-addon">
+                                            <span class="fa fa-clock-o"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row vehiclelist">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Vehicle </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select id="VehicleListId" name="VehicleListId" class="form-control select2-vehicle"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row vehiclelist">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Capacity </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input class="form-control input-sm" readonly id="Capacity" name="Capacity" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row driverlist">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Driver </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <select asp-for="DriverId" class="form-control select2-driver"></select>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label"> Remarks </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control input-sm" id="Remarks" name="Remarks"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="button" class="btn btn-w-m btn-primary ladda-button " id="btnSave" onclick="SaveTrip(1)">Save</button>
+                                    <button type="button" class="btn btn-w-m btn-primary ladda-button " id="btnUpdate" onclick="SaveTrip(2)">Update</button>
+                                    <button type="button" class="btn btn-w-m btn-warning ladda-button " id="btnCancel" onclick="CancelThisTrip()">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<div class="modal fade" id="ModalCancelRemarks" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                <h4 class="modal-title" style="font-size: 15px;">Please provide cancel reason</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label>Cancel Reason</label>
+                    <input type="hidden" class="form-control" id="CancelId" value="0" />
+                    <input type="text" class="form-control" id="CancelReason" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" id="btnCancelGroup" onclick="CancelTrip();">Proceed</button>
+
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@section Scripts {
+    <script>
+
+    </script>
+}
+
+<script>
+
+
+
+    var reloader = 0;
+    var table1 = $('#tableDriverVehicle').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+        "searching": false,
+        "scrollX": true,
+        "bLengthChange": false,
+        "ajax": {
+            "url": "@Url.Content("~/driverpassengers/ShowPassengerLists")",
+            "type": "POST",
+            "data": function (d) {
+                var dtimestamp = @ViewBag.dget;
+                var tid = @ViewBag.tget;
+                d.timestamp = dtimestamp;
+                d.tid = tid;
+                d.trip = 1;
+            }
+        },
+        "columns": [
+            { "data": "id", title: "Action", width: "5%", align: "center", orderable: false, visible: false},
+            { "data": "company", title: "Company", orderable: false  },
+            { "data": "employeeID", title: "Employee No", orderable: false, visible: false},
+            { "data": "passengerName", title: "Passenger Name", orderable: false },
+            { "data": "position", title: "Position", orderable: false },
+            { "data": "statusDescription", title: "Status", orderable: false },
+            { "data": "instruction", title: "Instruction", orderable: false, visible: false },
+            { "data": "purpose", title: "Purpose", orderable: false, visible: false},
+            { "data": "remarks", title: "Remarks", orderable: false, visible: false},
+            { "data": "serviceType", title: "Service Type", orderable: false, visible: false },
+            { "data": "origin", title: "Origin", orderable: false, visible: false },
+            { "data": "destination", title: "Destination", orderable: false, visible: false },
+            { "data": "tripTimeFrom", title: "From", orderable: false, visible: false },
+            { "data": "tripTimeTo", title: "To", orderable: false, visible: false }
+        ]
+        ,
+        'select': {
+            'style': 'single'
+        },
+        'columnDefs': [
+            {
+                "targets": "_all", // your case first column
+                "className": "text-center",
+            }],
+        "order": [[0, "desc"]],
+        "initComplete": function (settings, json) {
+            if (reloader == 0) {
+                reloader = 1;
+                var myVar = setInterval(function () {
+                    $('#tableDriverVehicle').DataTable().columns.adjust().draw();
+                    clearInterval(myVar);
+                }, 500);
+
+            }
+        }
+    });
+
+</script>
+
+
+<script>
+    function reInitVehicleDriver() {
+                $(".select2-vehicle").select2({
+                        ajax: {
+                            type: "POST",
+                            url: "@Url.Content("~/vehiclelists/getAvailableVehicle")?d=@ViewBag.unixtimeFormatted&timefrom=" + $("#ServiceStartDate").val()+ "&timeto="+$("#ServiceEndDate").val(),
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    q: params.term, // search term
+                                    page: params.page
+                                };
+                            },
+                            processResults: function (data, page) {
+                                // parse the results into the format expected by Select2.
+                                // since we are using custom formatting functions we do not need to
+                                // alter the remote JSON data
+                                return {
+                                    results: data.items
+                                };
+                            },
+                            cache: false
+                        },
+                        minimumInputLength:1,
+                        width: '100%'
+                });
+
+                $(".select2-vehicle").change(function () {
+                        $("#Capacity").val('');
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Content("~/trips/checkcapacity/")"+ this.value,
+                            data: "vehicleId=" + this.value,
+                            //"contentType": "application/json; charset=utf-8",
+                            dataType: "JSON",
+                            success: function (data, textStatus, jqXHR) {
+                                $("#Capacity").val(data.vehicleCapacity);
+                            }
+                        });
+                });
+
+                $(".select2-driver").select2({
+                    ajax: {
+                        type: "POST",
+                        url: "@Url.Content("~/drivers/getAvailableDriver")?d=@ViewBag.unixtimeFormatted&timefrom=" + $("#ServiceStartDate").val()+ "&timeto="+$("#ServiceEndDate").val(),
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term, // search term
+                                page: params.page
+                            };
+                        },
+                        processResults: function (data, page) {
+                            // parse the results into the format expected by Select2.
+                            // since we are using custom formatting functions we do not need to
+                            // alter the remote JSON data
+                            return {
+                                results: data.items
+                            };
+                        },
+                        cache: false
+                    },
+                    minimumInputLength:1,
+                    width: '100%'
+            });
+    }
+    reInitVehicleDriver();
+
+    function clearOtherDate() {
+        $("#ServiceEndDate").val("");
+        $("#VehicleListId").val("").trigger("change");
+        $("#DriverId").val("").trigger("change");
+    }
+
+    function checktime() {
+        var _start = parseInt($("#ServiceStartDate").val().replace(':', ''));
+        var _end = parseInt($("#ServiceEndDate").val().replace(':', ''));
+
+        if (_end <= _start) {
+
+            swal({
+                title: "Error",
+                text: "Invalid Time",
+                type: "error"
+            });
+
+            clearOtherDate();
+        }
+    }
+
+
+    function SaveTrip(i) {
+
+        if ($("#ReservationTypeId").val() == "" ||
+            $("#ServiceStartDate").val() == "" ||
+            $("#ServiceEndDate").val() == "" ||
+            $("#VehicleListId").val() == "" ||
+            $("#Capacity").val() == "" ||
+            $("#DriverId").val() == "" ||
+            $("#Remarks").val() == "") {
+
+            swalAlertOnly("Error", "Please complete all fields." , "error");
+        }
+        else {
+            var _txt = "";
+            if (i == 1) {
+                _txt = "This will create a trip schedule";
+            } else {
+                _txt = "This will update this trip";
+            }
+            swal({
+                title: "Are you sure?",
+                text: _txt,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Save it!",
+                closeOnConfirm: false
+            }, function () {
+
+                SubmitForm(i);
+
+            });
+        }
+
+
+    }
+
+
+    function SubmitForm(i) {
+                var l = $('#btnSave').ladda();
+                l.ladda('start');
+                $(".btn").attr("disabled", "disabled");
+                $(".confirm").attr("disabled", "disabled");
+        $(".cancel").attr("disabled", "disabled");
+        var _url = "";
+        if (i == 1) {
+            _url = "@Url.Content("~/trips/create")";
+        } else {
+            _url = "@Url.Content("~/trips/edit/")" + "@_dtrip.Id" + "?id=@_dtrip.Id"+"&";
+        }
+
+
+        $("#ModalLoadingSMS").modal('show');
+        $("#ModalLoadingSMS").css('display', 'block');
+                    $.ajax({
+                            type: "POST",
+                        url: _url,
+                        data: $("#formTrip").serialize() +"&ServiceDateTimeStamp=@ViewBag.unixtimeFormatted&t=@ViewBag.tGet",
+                            //"contentType": "application/json; charset=utf-8",
+                            dataType: "JSON",
+                            success: function (data, textStatus, jqXHR) {
+                                console.log(data);
+                                if (data.success == 1) {
+                                    $("#createTrip").modal("hide");
+                                     swal({
+                                                title: "Success",
+                                                text: data.message,
+                                                type: "success"
+                                            },
+                                    function () {
+                                      window.location.href = "@Url.Content("~/trips/detailsDriver")" + "?d=@ViewBag.dget";
+                                    });
+                                    //swalAlertOnly("Success", data.message, "success");
+                                } else {
+                                    swalAlertOnly("Error", data.message, "error");
+                                }
+                                $("#ModalLoadingSMS").css('display', 'none');
+                                l.ladda('stop');
+                                $(".btn").removeAttr("disabled");
+                                $(".confirm").removeAttr("disabled");
+                                $(".cancel").removeAttr("disabled");
+                            }
+                    });
+
+
+                }
+</script>
+
+
+@if (_dtrip != null)
+{
+    if (_dtrip.Id > 0)
+    {
+        <script>
+
+            $("#ServiceStartDate").val("@_dtrip.ServiceStartDate.ToString("HH:mm")").trigger('change');
+            $("#ServiceEndDate").val("@_dtrip.ServiceEndDate.ToString("HH:mm")").trigger('change');
+            $("#Remarks").val('@_dtrip.Remarks');
+            var modelplate = '@ViewBag.ModelPlate';
+            $('#VehicleListId').append(`<option value='@_dtrip.VehicleListId' selected>` + modelplate +`</option>`).val('@_dtrip.VehicleListId').trigger('change');
+            $('#DriverId').append(`<option value='@_dtrip.DriverId' selected>@ViewBag.Driver</option>`).val('@_dtrip.DriverId').trigger('change');
+
+            $("#ServiceEndDate").val("@_dtrip.ServiceEndDate.ToString("HH:mm")");
+
+            $("#btnSave").addClass("hidden");
+            $("#btnSave").addClass("disabled");
+        </script>
+    }
+    else
+    {
+        <script>
+            $("#btnUpdate").addClass("hidden");
+            $("#btnUpdate").addClass("disabled");
+            $("#btnCancel").addClass("hidden");
+            $("#btnCancel").addClass("disabled");
+
+            $("#ServiceStartDate").val("@_dhead.TripTimeFrom").trigger('change');
+            $("#ServiceEndDate").val("@_dhead.TripTimeTo").trigger('change');
+        </script>
+    }
+}
+
+@if (_dhead.ServiceTypeId == 2)
+{
+
+    <script>
+        $(".vehiclelist").addClass("hidden");
+        $('#VehicleListId').append(`<option value='0' selected>null</option>`).val('0').trigger('change');
+        $('#Capacity').val('0');
+
+    </script>
+
+}
+else if (_dhead.ServiceTypeId == 3)
+{
+
+    <script>
+        $(".driverlist").addClass("hidden");
+        $('#DriverId').append(`<option value='0' selected>null</option>`).val('0').trigger('change');
+    </script>
+}
+
+
+<script>
+
+    function CancelThisTrip() {
+        $("#CancelId").val("@_dtrip.Id");
+        $("#CancelReason").val("");
+        $("#ModalCancelRemarks").modal("show");
+
+    }
+
+    
+    function CancelTrip() {
+
+        if ($.trim($("#CancelReason").val()) == "") {
+            swalAlertOnly("Error", "Please provide cancel reason", "error");
+            return false;
+        } else {
+
+
+                            var _url = "@Url.Content("~/trips/Cancel/")" + $("#CancelId").val() ;
+      
+
+                            $.ajax({
+                                    type: "POST",
+                                    url: _url,
+                                data: "id=" + $("#CancelId").val() + "&t=@ViewBag.tget&CancelReason=" + $("#CancelReason").val(),
+                                    //"contentType": "application/json; charset=utf-8",
+                                    dataType: "JSON",
+                                    success: function (data, textStatus, jqXHR) {
+                                        console.log(data);
+                                        if (data.success == 1) {
+                                            $("#ModalSelectTrip").modal("hide");
+                                            $("#ModalCancelRemarks").modal("hide");
+                                            $("#CancelReason").val('');
+
+                                            swal({
+                                                        title: "Success",
+                                                        text: data.message,
+                                                        type: "success"
+                                                    },
+                                            function () {
+                                              window.location.href = "@Url.Content("~/trips/AssignTrip")" + "?t=@ViewBag.tGet&tempid=@ViewBag.tempid&d=@ViewBag.dget";
+                                            });
+                                        } else {
+                                            swalAlertOnly("Error", data.message, "error");
+                                        }
+                                    }
+                            });
+        }
+    }
+
+
+    
+    function OpenModalAddPassengerByPass() {
+        var dtimestamp = @ViewBag.unixtime;
+
+        window.location.href = '@Url.Content("~/driverpassengers/create")' + '?ft=1&d='+ (dtimestamp / 1000)+"&t=@ViewBag.tGet&tempid=@ViewBag.tempid";
+        //$("#ModalAddPassengerByPass").modal("show");
+
+    }
+
+
+
+</script>

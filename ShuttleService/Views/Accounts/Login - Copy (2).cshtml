@@ -1,0 +1,198 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" href="~/guideline/reservation_icon.png" />
+    <title>SSRS | Login</title>
+
+    <link href="~/css_free/bootstrap.min.css" rel="stylesheet">
+    <link href="~/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <link href="~/css_free/animate.css" rel="stylesheet">
+    <link href="~/css_free/style.css" rel="stylesheet">
+    <!-- Mainly scripts -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/jquery-3.7.1.js.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/bootstrap.min.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/inspinia.js"></script>
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/pace/pace.min.js"></script>
+
+    <!-- Steps -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/staps/jquery.steps.min.js"></script>
+
+    <!-- Jquery Validate -->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/validate/jquery.validate.min.js"></script>
+
+    @*for sweetalert*@
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/sweetalert/sweetalert.min.js"></script>
+    @*end for sweetalert*@
+    <!-- Input Mask-->
+    <script src="https://repo.aunasin.com/assets/tths/js_free/plugins/jasny/jasny-bootstrap.min.js"></script>
+</head>
+
+<body class="gray-bg">
+
+    <div class="loginColumns animated fadeInDown windows">
+        <div class="row">
+
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2 class="font-bold text-center">Shuttle Service Reservation System</h2>
+
+                <div class="ibox-content">
+                    <center><label style="color:#ec4758">Windows Account Login</label></center>
+                        <form method="post" id="windowForm" asp-action="@Url.Content("~/login")" asp-route-returnurl="@ViewBag.ReturnUrl">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <input type="hidden" name="ltype" value="windows" />
+                            <div class="form-group">
+                                <select name="Domain" class="form-control" placeholder="Domain" required>
+                                    <option value="smcdacon">SMCDACON</option>
+                                    <option value="semcalaca">SEMCALACA</option>
+                                    <option value="semiraramining">SEMIRARAMINING</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="UserName" class="form-control" autocomplete="off" placeholder="Username" required />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="Password" class="form-control" placeholder="Password" required />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
+
+                            <a class="btn btn-sm btn-danger btn-block" href="#" onClick="showLocal();">or Login using local account</a>
+
+                            <br />
+
+                            <p class="text-muted text-center">
+                                <small>Do not have an account?</small>
+                            </p>
+                            <a class="btn btn-sm btn-white btn-block" href="register">Create an account</a>
+                        </form>
+
+</div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                SMPC - ICT
+                <b>
+                    Shuttle Service Reservation System
+                </b>
+                <small class="pull-right">&copy; 2020 - @DateTime.Now.Year</small>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="loginColumns animated fadeInDown local hidden">
+        <div class="row">
+
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2 class="font-bold text-center">Shuttle Service Reservation System</h2>
+
+                <div class="ibox-content">
+                    <center><label style="color:#ec4758">Local Account Login</label></center>
+                    <form method="post" id="localForm" asp-action="@Url.Content("~/locallogin")" asp-route-returnurl="@ViewBag.ReturnUrl">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input type="hidden" name="ltype" value="local" />
+                        <div class="form-group">
+                            <input asp-for="UserName" class="form-control"autocomplete="off"  placeholder="Username" required />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input asp-for="Password" class="form-control" placeholder="Password" required />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <a href="#">
+                            <small>Forgot password?</small>
+                        </a>
+                        <hr />
+
+                        <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
+
+                        <a class="btn btn-sm btn-danger btn-block" href="#" onClick="showWindows();">or Login using windows account</a>
+
+                        <br />
+
+                        <p class="text-muted text-center">
+                            <small>Do not have an account?</small>
+                        </p>
+                        <a class="btn btn-sm btn-white btn-block" href="register">Create an account</a>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                SMPC - ICT
+                <b>
+                    Shuttle Service Reservation System
+                </b>
+                <small class="pull-right">&copy; 2020 - @DateTime.Now.Year</small>
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+</html>
+
+
+<script>
+
+    function showLocal() {
+        $(".local").removeClass("hidden");
+        $(".windows").addClass("hidden");
+        $("#localForm").attr("method", "post");
+        $("#windowForm").removeAttr("method");
+
+    }
+
+    function showWindows() {
+        $(".windows").removeClass("hidden");
+        $(".local").addClass("hidden");
+        $("#windowForm").attr("method", "post");
+        $("#localForm").removeAttr("method");
+    }
+
+</script>
+@if (@ViewBag.m == "local")
+{
+    <script>
+
+        showLocal();
+
+    </script>
+}
+
+

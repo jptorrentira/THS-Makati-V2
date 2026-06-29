@@ -1,0 +1,27 @@
+﻿@model IEnumerable<ShuttleService.Models.SurveyQuestion>
+@{
+    Layout = null;
+}               
+@{
+    foreach (var q in ViewData["SurveyQuestion"] as IEnumerable<ShuttleService.Models.SurveyQuestion>)
+    {
+    <form class="formSurvey" >
+        <input name="SurveyQuestionId" type="hidden" value="@q.Id" readonly />
+
+        <label>@q.Question</label>
+
+        <div class="i-checks"><label><input type="radio" name="AnswerScore" value="4" checked /><i></i> Extremely Satisfied</label></div>
+        <div class="i-checks"><label><input type="radio" name="AnswerScore" value="3" /><i></i> Satisfied</label></div>
+        <div class="i-checks"><label><input type="radio" name="AnswerScore" value="2" /><i></i> Somewhat Satisfied</label></div>
+        <div class="i-checks"><label><input type="radio" name="AnswerScore" value="1" /><i></i> Unsatisfied</label></div>
+
+        <br />
+
+        <label>Comments/Suggestions</label>
+        <textarea name="Remarks" class="form form-control required"></textarea>
+        <hr />
+    </form>
+    }
+
+}
+

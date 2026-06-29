@@ -1,0 +1,360 @@
+﻿
+@{
+    ViewData["Title"] = "Driver List";
+}
+
+<style>
+    .select2-container {
+        z-index: 99999 !important;
+        width: 100% !important;
+    }
+</style>
+<div class="wrapper-content row">
+    <div class="col-md-10 pull-left">
+        <h4>Driver List</h4>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class=" col-sm-12">
+        <a href='javascript:void(0);' onClick='Add()' class='btn btn-sm btn-success'> Add Driver </a>
+    </div>
+    <div class=" col-sm-12">
+        <table id="data_table" class="table table-striped table-bordered table-hover text-center table100"></table>
+
+    </div>
+</div>
+
+<div class="modal fade" role="dialog" id="modal-edit" style="z-index: 9990!important;" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-md" role="document">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Driver Information.</h3>
+            </div>
+            <form id="formData">
+                <div class="modal-body form-horizontal">
+
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> First Name </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm hidden" disabled id="Id" name="Id" />
+                                <input class="form-control input-sm " id="FirstName" name="FirstName" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Last Name</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm " id="LastName" name="LastName" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Birthday </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm datepicker" id="Birthday" name="Birthday" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Civil Status </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <select name="CivilStatus" id="CivilStatus" style="z-index: 99999!important;" class="form-control">
+                                    <option disabled selected>--- SELECT ---</option>
+                                    <option value="MARRIED">MARRIED</option>
+                                    <option value="SINGLE">SINGLE</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> License Restriction </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm " id="License_Restriction" name="License_Restriction" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> License Expiry </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm datepicker" id="License_Expiry" name="License_Expiry" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Mobile Number </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control input-sm " id="MobileNumber" name="MobileNumber" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Company Group </label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="form-control" id="CompanyGroupId" name="CompanyGroupId" asp-items="ViewBag.CompanyGroupList">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="locationField" style="display: none;">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Location/s </label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="form-control select2simple" id="LocationIds" name="LocationIds" multiple asp-items="ViewBag.LocationListId">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label class="control-label"> Status </label>
+                            </div>
+                            <div class="col-sm-8">
+                                <select name="Status" id="Status" style="z-index: 99999!important;" class="form-control">
+                                    <option disabled selected>--- SELECT ---</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </form>
+            <div class="modal-footer">
+                <div class="btn-group pull-right">
+                    <button class="ladda-button btn btn-primary" onClick="SaveUpdate();" id="btnSave" type="button" data-style="expand-left">Save</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<environment include="Development,Staging,Production">
+    <!-- DataTables -->
+    @section Scripts {
+        <script src="https://repo.aunasin.com/assets/tths/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="https://repo.aunasin.com/assets/tths/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="https://repo.aunasin.com/assets/tths/vendors/datatables.net/js/dataTables.select.min.js"></script>
+    }
+</environment>
+
+<script>
+    $(document).ready(function() {
+        // Initial check
+        checkCompanyGroup();
+
+        // Trigger check when CompanyGroupId changes
+        $("#CompanyGroupId").on("change", function() {
+            checkCompanyGroup();
+        });
+
+        $(".select2simple").select2();       
+    });
+
+    var reloader = 0;
+    var table1 = $('#data_table').DataTable({
+            "processing": false,
+            "serverSide": true,
+            "autoWidth": false,
+            "searching": true,
+            "scrollX": true,
+            "bLengthChange": false,
+            "ajax": {
+                "url": "@Url.Content("~/drivers/ShowDriverLists")",
+                "type": "POST"
+            },
+            "columns": [
+
+                { "data": "id", title: "ID", width: "5%", align: "center", visible: false, orderable: false },
+                { "data": "action", title: "Action", orderable: false },
+                { "data": "lastName", title: "LastName", orderable: false },
+                { "data": "firstName", title: "FirstName", orderable: false },
+                { "data": "birthday", title: "Birthday", orderable: false },
+                { "data": "license_Restriction", title: "License Restriction", orderable: false },
+                { "data": "license_Expiry", title: "License Expiry", orderable: false },
+                { "data": "civil_status", title: "Civil Status", visible: false,  orderable: false },
+                { "data": "mobileNumber", title: "Mobile Number", orderable: false },
+                { "data": "companyGroupName", title: "Company Group", orderable: false },
+                { "data": "status", title: "Status", orderable: false }
+            ]
+            ,
+            'select': {
+                'style': 'single'
+            },
+            'columnDefs': [
+                {
+                    "targets": "_all", // your case first column
+                    "className": "text-center",
+                }],
+            "order": [[2, "asc"]],
+            "initComplete": function (settings, json) {
+                if (reloader == 0) {
+                    reloader = 1;
+                    var myVar = setInterval(function () {
+                        $('#data_table').DataTable().columns.adjust().draw();
+                        clearInterval(myVar);
+                    }, 500);
+
+                }
+            }
+        });
+
+    function Add() {
+        $('#formData').trigger("reset");
+        $("#modal-edit").modal("show");
+        $("#CompanyGroupId").val(null);
+        checkCompanyGroup();
+    }
+
+
+    function Edit(id) {
+
+            $("#VehicleId").val("");
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/drivers/updateList")?id=" + id,
+
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        if (data.success == 1) {
+
+
+                            $("#FirstName").val(data['userData'][0].firstName);
+                            $("#LastName").val(data['userData'][0].lastName);
+                            $("#Birthday").val(data['userData'][0].birthday);
+                            $("#License_Restriction").val(data['userData'][0].license_Restriction);
+                            $("#License_Expiry").val(data['userData'][0].license_Expiry);
+                            $("#CivilStatus").val(data['userData'][0].civil_status).trigger("change");
+                            $("#MobileNumber").val(data['userData'][0].mobileNumber);
+
+                            $("#Status").val(data['userData'][0].status).trigger("change");
+                            $("#CompanyGroupId").val(data['userData'][0].companyGroup).trigger("change");
+                            $("#Id").val(data['userData'][0].id);
+
+                            if (data['userData'][0].locationIds && data['userData'][0].locationIds.length > 0) {
+                                $("#LocationIds").val(data['userData'][0].locationIds).trigger('change');
+                            } else {
+                                $("#LocationIds").val(null).trigger('change');
+                            }
+
+                            $("#modal-edit").modal("show");
+
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                    }
+                });
+    }
+
+    function checkCompanyGroup() {
+        var group = $("#CompanyGroupId option:selected").text();
+        if (group === "UPDI") {
+            $("#locationField").show();
+        } else {
+            $("#locationField").hide();
+            $("#LocationIds").val(null).trigger("change"); // clear selection
+        }
+    };
+
+    function SaveUpdate() {
+        var isUPDI =  $("#CompanyGroupId option:selected").text() === "UPDI";
+        var selectedLocations = $("#LocationIds").val();
+        if ($("#LastName").val() == '' || $("#FirstName").val() == '' || $("#Birthday").val() == '' || $("#CivilStatus").val() == ''
+            || $("#License_Restriction").val() == ''
+            || $("#License_Expiry").val() == ''
+            || $("#MobileNumber").val() == ''
+            || $("#CompanyListId").val() == ''
+            || $("#Status").val() == '') {
+
+            swalAlertOnly("Error", "Please complete all details.", "error");
+        }
+        else if(isUPDI && (!selectedLocations || selectedLocations.length === 0)){
+            swalAlertOnly("Error", "Please complete all details.", "error");
+        }
+        else {
+            swal({
+                title: "Are you sure?",
+                text: "This will update the details for this driver",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Save it!",
+                closeOnConfirm: false
+            }, function () {
+
+                SubmitForm();
+
+            });
+        }
+    }
+
+
+    function SubmitForm() {
+        $("#loading").modal("show");
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Content("~/drivers/saveUpdate/")" + $("#Id").val(),
+                data: $("#formData").serialize() + "&id=" + $("#Id").val(),
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        //console.log(data);
+                        if (data.success == 1) {
+                            $('#data_table').DataTable().clear().draw();
+                            $('#data_table').DataTable().ajax.reload();
+                            $("#modal-edit").modal("hide");
+                            swalAlertOnly("Success", data.message, "success");
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                        $("#loading").modal("hide");
+                    }
+        });
+
+
+    }
+
+     $('.datepicker').datepicker({
+        keyboardNavigation: false,
+        forceParse: false,
+        autoclose: true,
+        todayHighlight: false
+    });
+
+</script>

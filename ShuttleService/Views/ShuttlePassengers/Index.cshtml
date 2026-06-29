@@ -1,0 +1,255 @@
+﻿
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+
+<div class="wrapper wrapper-content animated">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5 style="color:firebrick">Shuttle Reservation Calendar </h5>
+                </div>
+                <div class="ibox-content">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade elwyn_modal-center" id="Guideline" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: white; padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                    <center>
+                        <h4 class="modal-title" id="ModalTitle" style="color: black!important;font-size: 15px;">MAKATI-CALACA Shuttle Reservation Guidelines</h4>
+                    </center>
+
+                </div>
+                <div class="modal-body">
+
+                     <img src="https://repo.aunasin.com/assets/tths/guideline/GS_Shuttle_Guidelines.JPG" style="width:100%;" height="800" name="foo">
+                    @* <iframe src="https://repo.aunasin.com/assets/tths/guideline/Calaca shuttle guidlines.pdf" style="width:100%;" height="800" name="foo"></iframe>*@
+                    <center>
+                        <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">I Understand</button>
+                    </center>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+@if (ViewBag.showGuidelines == 1)
+{
+        <script>
+            $(document).ready(function () {
+                $("#Guideline").modal('show');
+            });
+        </script>
+}
+
+
+<script>
+
+
+    $(document).ready(function () {
+
+
+        //$('.i-checks').iCheck({
+        //    checkboxClass: 'icheckbox_square-green',
+        //    radioClass: 'iradio_square-green'
+        //});
+
+        ///* initialize the external events
+        // -----------------------------------------------------------------*/
+
+
+        //$('#external-events div.external-event').each(function () {
+
+        //    // store data so the calendar knows to render an event upon drop
+        //    $(this).data('event', {
+        //        title: $.trim($(this).text()), // use the element's text as the event title
+        //        stick: true // maintain when user navigates (see docs on the renderEvent method)
+        //    });
+
+        //    // make the event draggable using jQuery UI
+        //    $(this).draggable({
+        //        zIndex: 1111999,
+        //        revert: true,      // will cause the event to go back to its
+        //        revertDuration: 0  //  original position after the drag
+        //    });
+
+        //});
+
+
+
+        /* initialize the calendar
+      -----------------------------------------------------------------*/
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+        var eventArray = [];
+
+
+
+        //eventArray.push('Long Event 2');
+        //eventDateArray.push('2019-10-17');
+
+
+
+
+        var calendarView = $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                //right: 'month'
+            },
+            displayEventTime: false,
+            dayClick: function (date, jsEvent, view) {
+                var dateToday = new Date();
+                //if (dateToday >= date) {
+                //    alert('FUCKED');
+                //} else {
+
+                $("#loading").modal('show');
+
+                window.location.href = "shuttlepassengers/details?t=sr&d=" + (date / 1000);
+                //}
+                //alert('Clicked on: ' + date.format());
+            },
+            editable: false,
+            droppable: false, // this allows things to be dropped onto the calendar
+            drop: function () {
+            },
+            eventLimit: 10, // for all non-TimeGrid views
+            views: {
+                timeGrid: {
+                    eventLimit: 10 // adjust to 6 only for timeGridWeek/timeGridDay
+                }
+            },
+            events: []
+        });
+
+        eventArray = [
+            { title: 'New event', start: new Date() },
+            { title: 'New event', start: new Date() }
+        ];
+
+        //$('#calendar').fullCalendar('renderEvent', eventArray, true);
+
+        //$('#calendar').fullCalendar('addEventSource', eventArray);
+
+        $('.fc-prev-button').click(function () {
+            LoadCalendar(1);
+        });
+
+        $('.fc-next-button').click(function () {
+            LoadCalendar(1);
+        });
+
+
+
+        //var date = new Date();
+        //var d = date.getDate();
+        //var m = date.getMonth();
+        //var y = date.getFullYear();
+
+        //$.ajax({
+        //    type: "POST",
+        //    url: "/shuttlepassengers/ReloadCalendar?dateFilter=" + y + '-' + ("0" + (m + 1)).slice(-2) + '-' + ("0" + d).slice(-2) + "&method=shuttle&e=1",
+        //    //"contentType": "application/json; charset=utf-8",
+        //    dataType: "JSON",
+        //    success: function (data, textStatus, jqXHR) {
+        //        if (data.status == "OK") {
+        //            //$('#calendar').fullCalendar().eventSource.remove();
+        //            var events = [];
+        //            $.each(data.events, function (index, value) {
+
+        //                events.push({
+        //                    title: value['title'],
+        //                    start: value['start'],
+        //                    //all data
+        //                });
+        //                //console.log(value)
+        //            });
+        //            $('#calendar').fullCalendar('addEventSource', events);
+        //        }
+        //        else {
+        //            //alert(data.message);
+        //        }
+        //    }
+        //});
+
+        LoadCalendar(2);
+
+    });
+
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+
+
+
+
+
+    </script>
+
+}
+
+<script>
+
+
+
+
+    function LoadCalendar(e) {
+        var urlString = "";
+        if (e == 1) {
+            urlString = "@Url.Content("~/shuttlepassengers/ReloadCalendar")" + "?dateFilter=" + $('#calendar').fullCalendar('getDate').format() + "&method=shuttle&e=2";
+        } else {
+            var date = new Date();
+            var d = date.getDate();
+            var m = date.getMonth();
+            var y = date.getFullYear();
+
+            urlString = "@Url.Content("~/shuttlepassengers/ReloadCalendar")" + "?dateFilter=" + y + '-' + ("0" + (m + 1)).slice(-2) + '-' + ("0" + d).slice(-2) + "&method=shuttle&e=1";
+        }
+        //alert();
+
+        $.ajax({
+            type: "POST",
+            url: urlString,
+            //"contentType": "application/json; charset=utf-8",
+            dataType: "JSON",
+            success: function (data, textStatus, jqXHR) {
+                if (data.status == "OK") {
+                    $('#calendar').fullCalendar('removeEvents');
+                    var events = [];
+                    $.each(data.events, function (index, value) {
+                        //console.log(value);
+                        events.push({
+                            title: value[0]['title'],
+                            start: value[0]['start'],
+                            //all data
+                        });
+                        //console.log(value)
+                    });
+                   $('#calendar').fullCalendar('addEventSource', events);
+                }
+                else {
+                    //alert(data.message);
+                }
+            }
+        });
+    }
+
+
+</script>

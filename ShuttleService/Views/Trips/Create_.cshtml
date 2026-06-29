@@ -1,0 +1,100 @@
+﻿@model ShuttleService.Models.Trip
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Trip</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="TripControlNo" class="control-label"></label>
+                <input asp-for="TripControlNo" class="form-control" />
+                <span asp-validation-for="TripControlNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ServiceDateTimeStamp" class="control-label"></label>
+                <input asp-for="ServiceDateTimeStamp" class="form-control" />
+                <span asp-validation-for="ServiceDateTimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ServiceStartDate" class="control-label"></label>
+                <input asp-for="ServiceStartDate" class="form-control" />
+                <span asp-validation-for="ServiceStartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ServiceEndDate" class="control-label"></label>
+                <input asp-for="ServiceEndDate" class="form-control" />
+                <span asp-validation-for="ServiceEndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleListId" class="control-label"></label>
+                <select asp-for="VehicleListId" class ="form-control" asp-items="ViewBag.VehicleListId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Capacity" class="control-label"></label>
+                <input asp-for="Capacity" class="form-control" />
+                <span asp-validation-for="Capacity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RemainingCapacity" class="control-label"></label>
+                <input asp-for="RemainingCapacity" class="form-control" />
+                <span asp-validation-for="RemainingCapacity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DriverId" class="control-label"></label>
+                <select asp-for="DriverId" class ="form-control" asp-items="ViewBag.DriverId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReservationTypeId" class="control-label"></label>
+                <select asp-for="ReservationTypeId" class ="form-control" asp-items="ViewBag.ReservationTypeId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Remarks" class="control-label"></label>
+                <input asp-for="Remarks" class="form-control" />
+                <span asp-validation-for="Remarks" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EncodedBy" class="control-label"></label>
+                <input asp-for="EncodedBy" class="form-control" />
+                <span asp-validation-for="EncodedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastModifiedBy" class="control-label"></label>
+                <input asp-for="LastModifiedBy" class="form-control" />
+                <span asp-validation-for="LastModifiedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EncodeDate" class="control-label"></label>
+                <input asp-for="EncodeDate" class="form-control" />
+                <span asp-validation-for="EncodeDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ModifyDate" class="control-label"></label>
+                <input asp-for="ModifyDate" class="form-control" />
+                <span asp-validation-for="ModifyDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

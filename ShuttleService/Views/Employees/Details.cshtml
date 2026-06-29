@@ -1,0 +1,156 @@
+﻿@model ShuttleService.Models.Employee
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Employee</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.EmployeeNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EmployeeNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MiddleName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MiddleName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Position)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Position)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CompanyList)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompanyList.CompanyName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Gender)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Gender)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Nationality)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Nationality.NationalityName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MobileNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MobileNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LocalNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LocalNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CompanyEmail)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompanyEmail)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AlternativeEmail)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AlternativeEmail)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SupervisorEmployeeNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SupervisorEmployeeNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsImmediateHead)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsImmediateHead)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AlternateImmediateHead)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AlternateImmediateHead)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AlternateImmediateHeadValidFrom)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AlternateImmediateHeadValidFrom)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AlternateImmediateHeadValidTo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AlternateImmediateHeadValidTo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AlternateImmediateHeadValidity)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AlternateImmediateHeadValidity)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EncodedBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EncodedBy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LastModifiedBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LastModifiedBy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EncodeDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EncodeDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ModifyDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ModifyDate)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

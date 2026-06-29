@@ -1,0 +1,386 @@
+﻿
+
+@{
+    ViewData["Title"] = "Approved";
+}
+<div class="wrapper-content row">
+    <div class="col-md-6">
+        <h4>Approved Driver/Service Requests</h4>
+    </div>
+    <div class="col-md-6 ">
+        <div class="btn-group pull-right">
+            <button class="ladda-button btn btn-warning" id="btnCancel" type="button" data-style="expand-left">Cancel</button>
+        </div>
+    </div>
+</div>
+<br />
+<div class="wrapper wrapper-content animated fadeInRight white-bg">
+
+    <div class="">
+        <div class="row">
+            <div class=" col-sm-12">
+                <br />
+                <table id="data_table_approvals_group" class="table table-striped table-bordered table-hover text-center table100"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="ModalApproval" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                <h4 class="modal-title" id="ModalTitle" style="font-size: 15px;"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="btn-group pull-right">
+                            <button class="ladda-button btn btn-warning" id="btnCancelModal" type="button" data-style="expand-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="hidden" id="TransactionId" value="0" />
+                    <br />
+                    <table class="table table100 no-borders">
+                        <tr>
+                            <td width="20%">Requested By:</td>
+                            <td width="80%"> <label id="ReqBy"></label></td>
+                        </tr>
+                        <tr>
+                            <td width="20%">Schedule of Trip:</td>
+                            <td width="80%"><label id="TripDate"></label></td>
+                        </tr>
+                        <tr>
+                            <td width="20%">Charging Company:</td>
+                            <td width="80%"><label id="ChargingComp"></label></td>
+                        </tr>
+                        <tr>
+                            <td width="20%">Charging Department:</td>
+                            <td width="80%"><label id="ChargingDep"></label></td>
+                        </tr>
+                    </table>
+
+                    <table id="data_table_approvals_individual" class="table table-striped table-bordered table-hover table100"></table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="ModalCancelRemarks" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content modal-col-red">
+            <div class="modal-header" style=" padding: 10px 25px 5px 25px!important;border-style: none none solid none;">
+                <h4 class="modal-title" style="font-size: 15px;">Please provide cancel reason</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label>Cancel Reason</label>
+                    <input type="hidden" class="form-control" id="CancelMethod" value="0" />
+                    <input type="text" class="form-control" id="CancelReason" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="loaded">
+                    <button type="button" class="btn btn-danger waves-effect hidden" id="btnCancelGroup" onclick="CancelGroup(2);">Proceed</button>
+                    <button type="button" class="btn btn-danger waves-effect hidden" id="btnCancelIndividual" onclick="CancelIndividual(2);">Proceed</button>
+
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var table1 = $('#data_table_approvals_group').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+        "searching": false,
+        "scrollX": true,
+        "bLengthChange": false,
+        "ajax": {
+            "url": "@Url.Content("~/driverpassengers/ReservationApprovedGroup")",
+            "type": "POST"
+        },
+        "columns": [
+            { "data": "id", title: "Action", width: "5%", align: "center", orderable: false },
+            { "data": "transactionId", title: "Transaction ID", orderable: false },
+            { "data": "natureApplication", title: "Nature of Application", orderable: false },
+            { "data": "dateFiled", title: "Date Filed", orderable: false },
+            { "data": "tripDate", title: "Trip Date", orderable: false },
+            { "data": "requestedBy", title: "Requested By", orderable: false },
+            { "data": "checkBox", title: "Select", orderable: false }
+        ]
+        ,
+        'select': {
+            'style': 'single'
+        },
+        'columnDefs': [
+            {
+                "targets": "_all", // your case first column
+                "className": "text-center",
+            }],
+        "order": [[0, "desc"]]
+    });
+
+
+     var table2 = $('#data_table_approvals_individual').DataTable({
+        "processing": false,
+        "serverSide": true,
+        "autoWidth": false,
+        "searching": false,
+        "scrollX": true,
+        "bLengthChange": false,
+        "ajax": {
+            "url": "@Url.Content("~/driverpassengers/ReservationApprovedIndividual")",
+            "type": "POST",
+            "data": function (d) {
+                d.TransactionId = $("#TransactionId").val();
+            }
+        },
+        "columns": [
+            { "data": "id", title: "Id", width: "5%", align: "center", orderable: false, visible: false },
+            { "data": "transactionId", title: "Transaction ID", orderable: false, visible: false },
+            { "data": "fullName", title: "Name", orderable: false },
+            { "data": "natureApplication", title: "Nature of Application", orderable: false },
+            { "data": "dateFiled", title: "Date Filed", orderable: false },
+            { "data": "requestedBy", title: "Requested By", orderable: false },
+            { "data": "checkBox", title: "Select", orderable: false }
+        ]
+        ,
+        'select': {
+            'style': 'single'
+        },
+        'columnDefs': [
+            {
+                "targets": "_all", // your case first column
+                "className": "text-center",
+            }],
+         "order": [[0, "desc"]],
+         "initComplete": function (settings, json) {
+             console.log(json);
+         }
+    });
+
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#data_table_approvals_group').DataTable().columns.adjust().responsive.recalc();
+        }, 500);
+    });
+
+
+
+
+
+    $('#btnCancel').click(function () {
+        var checkcounter = 0;
+        $('.checkBoxGroup').each(function () {
+            if (this.checked) {
+                checkcounter++;
+            }
+        });
+
+
+        if (checkcounter >= 1) {
+
+            $("#btnCancelIndividual").removeClass('hidden');
+            $("#btnCancelGroup").removeClass('hidden');
+            $("#btnCancelIndividual").addClass('hidden');
+
+            $("#CancelReason").val('');
+            $("#ModalCancelRemarks").modal('show');
+            //swal({
+            //    title: "Are you sure?",
+            //    text: "This will Cancel all the person(s) under your team from all the checked Transaction ID(s)",
+            //    type: "warning",
+            //    showCancelButton: true,
+            //    confirmButtonColor: "#18a689",
+            //    confirmButtonText: "Yes, Approve it!",
+            //    closeOnConfirm: false
+            //}, function () {
+
+            //    ApproveGroup(2);
+
+            //});
+
+        }
+        else {
+            swalAlertOnly("Error", "Please select reservation you want to cancel.", "error");
+        }
+
+    });
+
+
+
+    $('#btnCancelModal').click(function () {
+        var checkcounter = 0;
+        $('.checkBoxIndividual').each(function () {
+            if (this.checked) {
+                checkcounter++;
+            }
+        });
+
+
+        if (checkcounter >= 1) {
+            $("#btnCancelIndividual").removeClass('hidden');
+            $("#btnCancelGroup").removeClass('hidden');
+            $("#btnCancelGroup").addClass('hidden');
+
+
+            $("#CancelReason").val('');
+            $("#ModalCancelRemarks").modal('show');
+            //swal({
+            //    title: "Are you sure?",
+            //    text: "This will Approve all the person(s) you selected below",
+            //    type: "warning",
+            //    showCancelButton: true,
+            //    confirmButtonColor: "#18a689",
+            //    confirmButtonText: "Yes, Approve it!",
+            //    closeOnConfirm: false
+            //}, function () {
+
+            //    ApproveIndividual(2);
+
+            //});
+
+        }
+        else {
+            swalAlertOnly("Error", "Please select reservation you want to cancel.", "error");
+        }
+
+
+
+
+
+
+    });
+
+
+
+
+    function CancelGroup(_method) {
+        $("#ModalCancelRemarks").modal("hide");
+        var l = $('#btnCancel').ladda();
+        l.ladda('start');
+        $(".btn").attr("disabled", "disabled");
+                var TransactionIds = "";
+                $('.checkBoxGroup').each(function () {
+                    if (this.checked) {
+                        TransactionIds += this.value + ",";
+                    }
+                });
+
+        $("#ModalLoading").modal("show");
+        $("#ModalLoading").css('display', 'block');
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/driverpassengers/cancelByGroup/")",
+                    data: {
+                        "TransactionId": TransactionIds,
+                        "CancelReason": $("#CancelReason").val()
+                    },
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        if (data.success == 1) {
+                            $('#data_table_approvals_group').DataTable().clear().draw();
+                            $('#data_table_approvals_group').DataTable().ajax.reload();
+
+                            swalAlertOnly("Success", data.message, "success");
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                        l.ladda('stop');
+                        $(".btn").removeAttr("disabled");
+
+                        $("#ModalLoading").css('display', 'none');
+                    }
+                });
+    }
+
+
+    function CancelIndividual(_method) {
+        $("#ModalCancelRemarks").modal("hide");
+
+        var l = $('#btnApproveModal').ladda();
+        l.ladda('start');
+        $(".btn").attr("disabled", "disabled");
+                var TransactionIds = "";
+                 $('.checkBoxIndividual').each(function () {
+                    if (this.checked) {
+                        TransactionIds += this.value + ",";
+                    }
+                });
+
+
+        //$("#ModalLoading").modal("show");
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Content("~/driverpassengers/cancelByIndividual")",
+                    data: {
+                        "TransactionId": TransactionIds,
+                        "CancelReason": $("#CancelReason").val()
+                    },
+                    //"contentType": "application/json; charset=utf-8",
+                    dataType: "JSON",
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        if (data.success == 1) {
+                            $('#data_table_approvals_individual').DataTable().clear().draw();
+                            $('#data_table_approvals_individual').DataTable().ajax.reload();
+                            $('#data_table_approvals_group').DataTable().clear().draw();
+                            $('#data_table_approvals_group').DataTable().ajax.reload();
+
+                            var table = $('#data_table_approvals_individual').DataTable();
+                            if (!table.data().count()) {
+                                $("#ModalApproval").modal('hide');
+                            }
+
+                            swalAlertOnly("Success", data.message, "success");
+                        } else {
+                            swalAlertOnly("Error", data.message, "error");
+                        }
+                        l.ladda('stop');
+                        $(".btn").removeAttr("disabled");
+
+                        //$("#ModalLoading").modal("hide");
+                        //$("#ModalLoading").modal("hide");
+                    }
+        });
+
+        //$("#ModalLoading").modal("hide");
+    }
+
+    function ViewEmployeeAjax(transId,ReqBy,TripDate,ChargingComp,ChargingDep) {
+
+        $("#ModalTitle").html("Driver / Shuttle vehicle request for cancellation - <b style='color:#18a689'>" + transId + "</b>");
+        $("#TransactionId").val(transId);
+        $("#ReqBy").html("<b style='color:#18a689'>" + ReqBy + "</b>");
+        $("#TripDate").html("<b style='color:#18a689'>" + TripDate + "</b>");
+        $("#ChargingComp").html("<b style='color:#18a689'>" + ChargingComp + "</b>");
+        $("#ChargingDep").html("<b style='color:#18a689'>" + ChargingDep + "</b>");
+        $('#data_table_approvals_individual').DataTable().clear().draw();
+        $('#data_table_approvals_individual').DataTable().ajax.reload();
+        $("#ModalApproval").modal("show");
+        setTimeout(function () {
+            $('#data_table_approvals_individual').DataTable().columns.adjust().responsive.recalc();
+        }, 500);
+    }
+
+</script>
