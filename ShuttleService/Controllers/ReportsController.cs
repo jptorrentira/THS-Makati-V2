@@ -403,10 +403,11 @@ namespace ShuttleService.Controllers
                 }
                 else
                 {
-                    smtp.Host = "mail.hoaccess.com";
+                    smtp.Host = "relay.smcdacon.com";
+                    //smtp.Host = "mail.hoaccess.com";
                     //SmtpServer = new SmtpClient("mail.hoaccess.com");
                     smtp.Credentials = new System.Net.NetworkCredential("smcdacon\\webhelpdeskadmin", "Str@wb3rry##");
-                    smtp.Port = 587;
+                    smtp.Port = 25;
                     smtp.EnableSsl = false;
                     mail.From = new MailAddress("webhelpdeskadmin@semirarampc.com", "Transport Hub System");
                 }
@@ -577,8 +578,9 @@ namespace ShuttleService.Controllers
                     mail.IsBodyHtml = true;
 
                     // ✅ SMTP configuration (per company if needed)
-                    string smtpServer = "mail.hoaccess.com";
-                    int smtpPort = 587;
+                    //string smtpServer = "mail.hoaccess.com";
+                    string smtpServer = "relay.smcdacon.com";
+                    int smtpPort = 25;
                     bool enableSsl = false;
                     string smtpUser = "webhelpdeskadmin@semirarampc.com";
                     string smtpPass = "Str@wb3rry##"; // ⚠️ Move this to appsettings or config file

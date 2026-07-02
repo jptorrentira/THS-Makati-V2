@@ -91,7 +91,7 @@ namespace ShuttleService.Controllers
             //var CompanyGroupList = _context.CompanyGroup.Where(m => m.Id == currentCompanyGroupId).OrderBy(m => m.Id).ToList();
             //ViewData["CompanyGroupId"] = new SelectList(CompanyGroupList, "Id", "CompanyGroupName");
 
-            var CompanyGroupList = _context.CompanyGroup.OrderBy(m => m.Id).ToList();
+            var CompanyGroupList = _context.CompanyGroup.OrderBy(m => m.Id).Take(1).ToList();
             ViewData["CompanyGroupId"] = new SelectList(CompanyGroupList, "Id", "CompanyGroupName");
 
             var LocationList = _context.Location.OrderBy(m => m.Id).ToList();
